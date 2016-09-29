@@ -1,5 +1,7 @@
 public class BoardItem {
-
+	//@ public invariant crate ==> ground;
+	//@ public invariant marked ==> ground;
+	
 	/** ground is true if the square is valid playing area (not a wall) */
     public boolean ground; 
     
@@ -10,6 +12,7 @@ public class BoardItem {
     public boolean crate;
     
     /** @informal creates a valid board item object */
+    //@ ensures ground == false && marked == false && crate == false;
     public BoardItem() {
         ground = false;
         marked = false;
