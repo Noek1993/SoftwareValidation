@@ -6,8 +6,8 @@ final class Position
 
   /** @informal only allow positive positions */
   //@ invariant x >= 0 && y >= 0;
-  /*@ spec_public */final int x;
-  /*@ spec_public */final int y;
+  /*@ spec_public @*/final int x;
+  /*@ spec_public @*/final int y;
 
   /** @informal based on valid parameters the constructor creates a valid position object */
   //@ requires x >= 0 && y >= 0;
@@ -38,7 +38,8 @@ final class Position
   //@ also
   //@ requires Math.abs(newPosition.x - x) + Math.abs(newPosition.y - y) != 1;
   //@ ensures \result == false;
-  boolean isValidNextPosition (Position newPosition) {
+  /*@ spec_public @*/
+  /*@ pure @*/boolean isValidNextPosition (Position newPosition) {
 	  int dX = newPosition.x - x;
 	  int dY = newPosition.y - y;
 	  if( dX >= -1 && dX <= 1 && dY >= -1 && dY <= 1) return true;

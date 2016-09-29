@@ -6,15 +6,18 @@ final class Player
 {
 
   /** @informal a player always has a position */
+  //@ public invariant position != null;
   public Position position;
 
   /** @informal based on valid parameters the constructor creates a valid player object */
+  //@ ensures this.position.equals (position);
   Player (Position position) {
     this.position = position;
   }
 
 
   /** @informal a player can only change position to a valid new position */
+  //@ requires position.isValidNextPosition (newPosition);
   public void setPosition (Position newPosition) {
 	    this.position = newPosition;
   }
