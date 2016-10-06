@@ -34,11 +34,17 @@ final class Game {
   }
 
   /** @informal Check precisely for the win situation */
-  //@ ensures \result == (\forall int x,y; x >= 0 && x < board.xSize && y >= 0 && y < board.ySize; board.items[x][y].marked ==> board.items[x][y].crate);
-  boolean wonGame () {
-      boolean result = true;
+  //@ ensures \result == (\forall int x; x >= 0 && x < board.xSize; (\forall int y; y >= 0 && y < board.ySize; board.items[x][y].marked ==> board.items[x][y].crate));
+  /*@ pure @*/ boolean wonGame () {
+    boolean result = true;
+    //@ loop_invariant x >= 0 && x <= board.xSize;
+    //@ loop_invariant result == \forall int i, j; i >= 0 && i < x && j >= 0 && j < board.ySize; !board.items[i][j].marked || board.items[i][j].crate;
+    //@ decreases board.xSize - x;
     for (int x = 0; result && x < board.xSize; x++) {
         boolean rowresult = true;
+        //@ loop_invariant y >= 0 && y <= board.ySize;
+        //@ loop_invariant rowresult == (\forall int i; i >= 0 && i < y; !board.items[x][i].marked || board.items[x][i].crate);
+        //@ decreases board.ySize - y;
         for (int y = 0; rowresult && y < board.ySize; y++) {
             if (board.items[x][y].marked && !board.items[x][y].crate) {
               rowresult = false; 
@@ -52,7 +58,7 @@ final class Game {
   /** @informal The core of the game - checks the validity of the move,
     *  moves the player to new position, rearranges the board.
     */
-  //@ requires !player.position.isValidNextPosition (newPosition) || !board.onBoard(newPosition) || !board.isOpen(newPosition);
+  //@ requires !player.position.isValidNextPosition (newPosition) || !board.onBoard(newPosition) || !board.items[newPosition.x][newPosition.y].ground;
   //@ ensures \result == false;
   //@ also
   //@ requires board.isOpen(newPosition);
@@ -60,23 +66,21 @@ final class Game {
   //@ requires board.onBoard(newPosition);
   //@ ensures \result == true;
   //@ also
-  //@ requires board.items[newPosition.x][newPosition.y].crate;
-  //@ requires board.items[newPosition.x][newPosition.y].ground;
-  //@ requires player.position.isValidNextPosition (newPosition);
   //@ requires board.onBoard(newPosition);
+  //@ requires board.items[newPosition.x][newPosition.y].crate;
+  //@ requires player.position.isValidNextPosition (newPosition);
   //@ requires board.isOpen(newPosition.x + (newPosition.x - player.position.x), newPosition.y + (newPosition.y - player.position.y));
   //@ ensures \result == true;
   //@ also
+  //@ requires board.onBoard(newPosition);
   //@ requires board.items[newPosition.x][newPosition.y].crate;
-  //@ requires board.items[newPosition.x][newPosition.y].ground;
   //@ requires player.position.isValidNextPosition (newPosition);
   //@ requires !board.isOpen(newPosition.x + (newPosition.x - player.position.x), newPosition.y + (newPosition.y - player.position.y));
-  //@ requires board.onBoard(newPosition);
   //@ ensures \result == false;
   boolean movePlayer (Position newPosition) {
 
     // First a light check if the move is allowed and the position is OK
-    if (!player.position.isValidNextPosition (newPosition) || !board.onBoard(newPosition)) {
+    if (!player.position.isValidNextPosition (newPosition) || !board.onBoard(newPosition) || !board.items[newPosition.x][newPosition.y].ground) {
       return false;
     }
 

@@ -6,7 +6,7 @@ final class Board {
   /** @informal The board has a positive size, is a square, and all items are defined. */
   //@ public invariant xSize > 0 && ySize > 0;
   //@ public invariant xSize == ySize;
-  //@ public invariant \forall int x,y; x >= 0 && x < xSize && y >= 0 && y < ySize; items[x][y] != null;
+  //@ public invariant \forall int x; x >= 0 && x < xSize; \forall int y; y >= 0 && y < ySize; items[x][y] != null;
   /** @informal All marked locations are in the valid playing area (that is, on the ground) */
   // See BoardItem.java
   /** @informal All crates are in the valid playing area */
@@ -19,7 +19,7 @@ final class Board {
 
   /** @informal based on valid parameters the constructor creates an "all wall" board */
   //@ requires xSize > 0 && ySize > 0 && xSize == ySize;
-  //@ ensures \forall int x,y; x >= 0 && x < xSize && y >= 0 && y < ySize; items[x][y].ground == false;
+  //@ ensures \forall int x; x >= 0 && x < xSize; \forall int y; y >= 0 && y < ySize; items[x][y].ground == false;
   //@ ensures items.length == xSize && items[0].length == ySize;
   Board (int xSize, int ySize) {
     this.xSize = xSize;

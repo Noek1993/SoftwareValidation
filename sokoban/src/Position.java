@@ -31,6 +31,7 @@ final class Position
     return false;
   }
 
+  // This one is fixed, previously the same square or squares 1 diagonal step away were also valid
   /** @informal a valid next position is always one move horizontally
    *    or vertically from the current one */
   //@ requires Math.abs(newPosition.x - x) + Math.abs(newPosition.y - y) == 1;
@@ -42,7 +43,7 @@ final class Position
   /*@ pure @*/boolean isValidNextPosition (Position newPosition) {
 	  int dX = newPosition.x - x;
 	  int dY = newPosition.y - y;
-	  if( dX >= -1 && dX <= 1 && dY >= -1 && dY <= 1) return true;
+	  if(Math.abs(dX) + Math.abs(dY) == 1) return true;
 	  return false;
   }
 
