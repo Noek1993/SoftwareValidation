@@ -6,7 +6,10 @@ final class Board {
   /** @informal The board has a positive size, is a square, and all items are defined. */
   //@ public invariant xSize > 0 && ySize > 0;
   //@ public invariant xSize == ySize;
-  //@ public invariant \forall int x; x >= 0 && x < xSize; \forall int y; y >= 0 && y < ySize; items[x][y] != null;
+  //@ public invariant xSize == items.length;
+  //@ public invariant \forall int x; x >= 0 && x < items.length; ySize == items[x].length;
+  //@ public invariant \nonnullelements (items);
+  //@ public invariant \forall int x; x >= 0 && x < items.length; \nonnullelements(items[x]);
   /** @informal All marked locations are in the valid playing area (that is, on the ground) */
   // See BoardItem.java
   /** @informal All crates are in the valid playing area */
