@@ -12,8 +12,8 @@ final class Board {
   /** @informal All crates are in the valid playing area */
   // See BoardItem.java
 	
-  /*@ spec_public @*/ int xSize; 
-  /*@ spec_public @*/ int ySize; 
+  /*@ spec_public @*/ final int xSize; 
+  /*@ spec_public @*/ final int ySize; 
 
   public BoardItem[][] items;
 
@@ -47,7 +47,7 @@ final class Board {
   /** @informal auxiliary method to establish that a position is on board and is open
    *     (the player can stand on it) */
   //@ requires onBoard(p);
-  //@ ensures \result == items[p.x][p.y].ground && !items[p.x][p.y].crate;
+  //@ ensures \result == (items[p.x][p.y].ground && !items[p.x][p.y].crate);
   //@ also
   //@ requires !onBoard(p);
   //@ ensures \result == false;
@@ -58,7 +58,7 @@ final class Board {
 
   /** @informal same as above for explicit coordinates */
   //@ requires onBoard(x, y);
-  //@ ensures \result == items[x][y].ground && !items[x][y].crate;
+  //@ ensures \result == (items[x][y].ground && !items[x][y].crate);
   //@ also
   //@ requires !onBoard(x, y);
   //@ ensures \result == false;
