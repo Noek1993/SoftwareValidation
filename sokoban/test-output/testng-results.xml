@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testng-results skipped="0" failed="0" total="0" passed="0">
+  <reporter-output>
+  </reporter-output>
+  <suite name="System Validation 2016 Homework 1" duration-ms="0" started-at="2016-10-06T14:47:44Z" finished-at="2016-10-06T14:47:44Z">
+    <groups>
+    </groups>
+  </suite> <!-- System Validation 2016 Homework 1 -->
+</testng-results>
