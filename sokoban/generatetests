@@ -14,6 +14,6 @@ sed --in-place 's/^.*new GameGUI.*$//g' Game.java
 
 cd ..
 
-jmlunitng --package --reflection --dest tests src_temp
+/usr/local/jdk_se7/bin/java -jar /usr/local/jmlunitng-1.4/lib/jmlunitng.jar --package --reflection --dest tests src_temp
 
 rm -rf src_temp

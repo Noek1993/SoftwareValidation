@@ -1,6 +1,6 @@
 <!DOCTYPE suite SYSTEM "http://beust.com/testng/testng-1.0.dtd" >
 
-<suite name="System Validation 2014 Homework 2" verbose="1">
+<suite name="System Validation 2016 Homework 1" verbose="1">
 
   <test name="movePlayer">
     <classes>
