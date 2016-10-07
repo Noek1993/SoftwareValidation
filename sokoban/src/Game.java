@@ -56,20 +56,27 @@ final class Game {
   /** @informal The core of the game - checks the validity of the move,
     *  moves the player to new position, rearranges the board.
     */
-  //@ requires !player.position.isValidNextPosition (newPosition) || !board.onBoard(newPosition) || !board.items[newPosition.x][newPosition.y].ground;
+  //@ normal_behaviour
+  //@ requires !player.position.isValidNextPosition (newPosition);
   //@ ensures \result == false;
-  //@ also
+  //@ also normal_behaviour
+  //@ requires !board.onBoard(newPosition);
+  //@ ensures \result == false;
+  //@ also normal_behaviour
+  //@ requires !board.items[newPosition.x][newPosition.y].ground;
+  //@ ensures \result == false;
+  //@ also normal_behaviour
   //@ requires board.isOpen(newPosition);
   //@ requires player.position.isValidNextPosition (newPosition);
   //@ requires board.onBoard(newPosition);
   //@ ensures \result == true;
-  //@ also
+  //@ also normal_behaviour
   //@ requires board.onBoard(newPosition);
   //@ requires board.items[newPosition.x][newPosition.y].crate;
   //@ requires player.position.isValidNextPosition (newPosition);
   //@ requires board.isOpen(newPosition.x + (newPosition.x - player.position.x), newPosition.y + (newPosition.y - player.position.y));
   //@ ensures \result == true;
-  //@ also
+  //@ also normal_behaviour
   //@ requires board.onBoard(newPosition);
   //@ requires board.items[newPosition.x][newPosition.y].crate;
   //@ requires player.position.isValidNextPosition (newPosition);
