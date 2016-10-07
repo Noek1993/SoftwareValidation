@@ -28,9 +28,44 @@ public /*@ nullable_by_default */ class Game_InstanceStrategy extends ObjectStra
    * @return local-scope instances of Game.
    */
   public RepeatedAccessIterator<?> localValues() {
+    Player p = new Player (new Position (3, 3));
+    Board a = new Board (7, 7);
+    Board b = new Board (7, 7);
+    Board c = new Board (7, 7);
+    for (int x = 1; x < 6; x++) {
+      for (int y = 1; y < 6; y++) {
+        a.items[x][y].ground = true;
+        b.items[x][y].ground = true;
+        c.items[x][y].ground = true;
+      }
+    }
+    // Board arrangement A (Empty push board)
+    Game ga = new Game (a, p);
+    
+    // Board arrangement B (Box board)
+    b.items[3][1].crate = true;
+    b.items[3][2].crate = true;
+    b.items[3][4].crate = true;
+    b.items[1][3].marked = true;
+    b.items[2][3].crate = true;
+    b.items[4][3].crate = true;
+    b.items[5][3].ground = false;
+    Game gb = new Game (b, p);
+    
+    // Board arrangement B (Wall board)
+    c.items[2][2].ground = true;
+    c.items[3][2].ground = true;
+    c.items[4][2].ground = true;
+    c.items[4][3].ground = true;
+    c.items[4][4].ground = true;
+    c.items[3][4].ground = true;
+    c.items[2][4].ground = true;
+    c.items[2][3].ground = true;
+    Game gc = new Game (c, p);
+	  
     return new ObjectArrayIterator<Object>
     (new Object[]
-     { /* add Game values or generators here */ });
+     { ga, gb, gc /* add Game values or generators here */ });
   }
 
   /**

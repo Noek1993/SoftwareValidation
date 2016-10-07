@@ -5,6 +5,9 @@
  * (do not modify this comment, it is used by JMLUnitNG clean-up routines)
  */
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.jmlspecs.jmlunitng.iterator.ObjectArrayIterator;
 import org.jmlspecs.jmlunitng.iterator.RepeatedAccessIterator;
 
@@ -23,9 +26,14 @@ public /*@ nullable_by_default */ class Game_movePlayer__Position_newPosition__0
    *  "Position newPosition".
    */
   public RepeatedAccessIterator<?> localValues() {
+  	List<Object> list = new ArrayList<Object>();
+  	for (int x = 0; x < 8; x++) {
+  		for (int y = 0; y < 8; y++) {
+  			list.add(new Position(x,y));
+  		}
+  	}
     return new ObjectArrayIterator<Object>
-    (new Object[]
-     { /* add local-scope Position values or generators here */ });
+    (list.toArray());
   }
 
   /**

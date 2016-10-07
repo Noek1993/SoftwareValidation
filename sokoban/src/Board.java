@@ -36,7 +36,7 @@ final class Board {
   }
   
   /** @informal auxiliary method to establish that a position is on the board */
-  //@ ensures \result == 0 <= p.x && p.x < xSize && 0 <= p.y && p.y < ySize;
+  //@ ensures \result == (0 <= p.x && p.x < xSize && 0 <= p.y && p.y < ySize);
   public /*@ pure @*/ boolean onBoard(Position p) {
       return 0 <= p.x && p.x < xSize && 0 <= p.y && p.y < ySize;
   }
