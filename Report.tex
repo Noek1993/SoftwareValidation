@@ -96,7 +96,116 @@ B[i3-1] <= B[i3] || (i3 == i1 && B[i3-1] <= B[i2]) ||
 	\newpage
 	
 	\section{JML Annotations and Runtime Assertion Checking}
-	The goal in this part of the assignment was to turn informal requirements into JML specifications, these were marked with \texttt{@informal} in the inline comments in the code. \\
+	The goal in this part of the assignment was to turn informal requirements into JML specifications, these were marked with \texttt{@informal} in the inline comments in the code. For doing this we mainly used \texttt{invariant, requires, ensures} and \texttt{assignable} were mostly used to create the JML specifications. Only in the \texttt{boolean movePlayer (Position newPosition)} method \texttt{assert} is used to create assertion in methods itself. This part is split up into 2 parts, the JML annotations and the runtime assertion checkers. In the first part the most important annotations are shown per class, less interesting or basic annotations are only briefly mentioned. In the runtime assertion checking part the results of runing the program with these annotation is discussed.
+
+	\subsection{JML Annotations}
+	\subsubsection{Position}
+	The first assertions added are in the \texttt{class Position}, these are used mainly for checking if a positions is valid. This firstly includes invariants that state that x and y are always 0 or more. Similar assertions are used for checking the input in the constructor.
+	\begin{lstlisting}
+//@ invariant x >= 0 && y >= 0;
+	\end{lstlisting}
+	The other applications of assertions in the \texttt{class Position} is for the method \texttt{boolean isValidNextPosition (Position newPosition)}. 
+	\begin{lstlisting}
+//@ requires Math.abs(newPosition.x - x) + Math.abs(newPosition.y - y) == 1;
+//@ ensures \result == true;
+//@ also
+//@ requires Math.abs(newPosition.x - x) + Math.abs(newPosition.y - y) != 1;
+//@ ensures \result == false;
+	\end{lstlisting}
+	Assertions are also added to the equals method and to the constructor, in which they state that the x and y values are set to the parameters.
+	
+	\subsubsection{Player}
+	Assertions added the \texttt{class Player} are all basic. To the constructor assertions are added to state that the position parameter is the same as the position of the player. To \texttt{public void setPosition (Position newPosition)} annotations are added that state the new position is valid and that position of the player equals the parameter.
+	\begin{lstlisting}
+//@ requires position.isValidNextPosition (newPosition);
+//@ ensures this.position.equals (position);
+	\end{lstlisting} 
+	
+	\subsubsection{BoardItem}
+	In \texttt{class BoardItem} invariants are added to state that if an item is a crate or is marked, it has to be ground. These specifications originate from the \texttt{class Board}.
+	\begin{lstlisting}
+	//@ public invariant crate ==> ground;
+	//@ public invariant marked ==> ground;
+	\end{lstlisting}
+	
+	\subsubsection{Board}
+	To the class \texttt{class Board} several assertions are added in ration to the size and state of the board.
+	\begin{lstlisting}
+//@ public invariant xSize > 0 && ySize > 0;
+//@ public invariant xSize == ySize;
+//@ public invariant xSize == items.length;
+//@ public invariant \forall int x; x >= 0 && x < items.length; 
+		ySize == items[x].length;
+//@ public invariant \nonnullelements (items);
+//@ public invariant \forall int x; x >= 0 && x < items.length; 
+		\nonnullelements(items[x]);
+	\end{lstlisting}
+	It is stated that the xSize and xSize need to be equal and both greater then zero, the dimensions of the array need to match the xSize and ySize and finally the elements in the array are not allowed to be null. The last 3 of these annotations are added because of problems that occurred during the Static checking (see \ref{sec:staticchecking}).
+	Annotations are added to the constructor to ensure the dimensions are valid and the array is filled with walls.
+	\begin{lstlisting}
+//@ assignable items;
+//@ assignable this.xSize;
+//@ assignable this.ySize;
+//@ requires xSize > 0 && ySize > 0 && xSize == ySize;
+//@ ensures \forall int x; x >= 0 && x < xSize; \forall int y; y >= 0 && y < ySize; 
+		items[x][y].ground == false;
+//@ ensures items.length == xSize && items[0].length == ySize;
+	\end{lstlisting}
+	Annotations added to \texttt{public boolean onBoard(Position p)}:
+	\begin{lstlisting}
+//@ ensures \result == (0 <= p.x && p.x < xSize && 0 <= p.y && p.y < ySize);
+	\end{lstlisting}
+	And annotations added to the \texttt{public boolean isOpen(Position p)}:
+	\begin{lstlisting}
+//@ requires onBoard(p);
+//@ ensures \result == (items[p.x][p.y].ground && !items[p.x][p.y].crate);
+//@ also
+//@ requires !onBoard(p);
+//@ ensures \result == false;
+	\end{lstlisting}
+	The annotations for both the \texttt{(Position p)} variant or the \texttt{(int x, int y)} variant are almost thesame, with the only difference to the input variable against which is checked.
+	
+	\subsubsection{Game}
+	The most important annotations int \texttt{class Game} are related to the \texttt{boolean wonGame ()} and \texttt{movePlayer (Position newPosition)}. The annotations added to \texttt{boolean wonGame ()} check if the result is true if all marked positions also are a crate. The annotation used in this methods are further explained in \ref{sec:staticchecking} Static Checking.
+	\begin{lstlisting}
+//@ ensures \result == (\forall int x; x >= 0 && x < board.xSize; 
+	(\forall int y; y >= 0 && y < board.ySize;
+		board.items[x][y].marked ==> board.items[x][y].crate));
+	\end{lstlisting}
+	The annotations to \texttt{movePlayer (Position newPosition)} are the most extensive annotations of the project, other then pre and post conditions multiple assertions are added to the body of the method.
+	\begin{lstlisting}
+//@ normal_behaviour
+//@ requires !player.position.isValidNextPosition (newPosition);
+//@ ensures \result == false;
+//@ also normal_behaviour
+//@ requires !board.onBoard(newPosition);
+//@ ensures \result == false;
+//@ also normal_behaviour
+//@ requires !board.items[newPosition.x][newPosition.y].ground;
+//@ ensures \result == false;
+//@ also normal_behaviour
+//@ requires board.isOpen(newPosition);
+//@ requires player.position.isValidNextPosition (newPosition);
+//@ requires board.onBoard(newPosition);
+//@ ensures \result == true;
+//@ also normal_behaviour
+//@ requires board.onBoard(newPosition);
+//@ requires board.items[newPosition.x][newPosition.y].crate;
+//@ requires player.position.isValidNextPosition (newPosition);
+//@ requires board.isOpen(newPosition.x + (newPosition.x - player.position.x), 
+	newPosition.y + (newPosition.y - player.position.y));
+//@ ensures \result == true;
+//@ also normal_behaviour
+//@ requires board.onBoard(newPosition);
+//@ requires board.items[newPosition.x][newPosition.y].crate;
+//@ requires player.position.isValidNextPosition (newPosition);
+//@ requires !board.isOpen(newPosition.x + (newPosition.x - player.position.x), 
+	newPosition.y + (newPosition.y - player.position.y));
+//@ ensures \result == false;
+	\end{lstlisting}
+	The annotations check for all the different situations that can happen within the method such as invalid positions, walls, boxes and they can be pushed or not.
+	
+	\subsection{Runtime Assertion Checking}
 	The following problems were found during runtime checking:
 	\begin{itemize}
 		\item Players could move through walls.
@@ -120,8 +229,40 @@ Math.abs(newPosition.y - y) == 1;
 	
 	The final problem was discovered based on the same specification as the second problem. According the code the current position of the player was also a valid next position, but according to the specification this is not the case. This problem was solved when the second problem was solved.
 	
+	\newpage
 	\section{Static Checking}
+	\label{Static Checking}
+	Within this section we will perform formal verification on the method \texttt{wonGame} in the \texttt{Game} class. The \texttt{wonGame} method is responsible for checking the winning situation on the game board after every move.
+	\newline 
+	We implemented four \texttt{loop invariants}, two per for loop. One describing if the $x$ or $y$ element was within the correct boundaries, the other is a nested \texttt{forall} loop checking the result. The loop invariant for the outer loop iterating of the $x$ was as following:
+	\begin{lstlisting}
+//@ loop_invariant x >= 0 && x <= board.xSize;
+//@ loop_invariant result == \forall int i; i >= 0 && i < x; 
+	(\forall int j; j >= 0 && j < board.ySize; 
+		!board.items[i][j].marked || board.items[i][j].crate);
+//@ decreases board.xSize - x;
+	\end{lstlisting}
+	The loop invariant for the inner loop iterating of the $y$ was as following:
+	\begin{lstlisting}
+//@ loop_invariant y >= 0 && y <= board.ySize;
+//@ loop_invariant rowresult == (\forall int i; i >= 0 && i < y; 
+	!board.items[x][i].marked || board.items[x][i].crate);
+//@ decreases board.ySize - y;
+	\end{lstlisting}
 	
+	A problem we encountered during the implementation of the nested \texttt{forall} loop was the nonzero error. Within the loop elements could not be zero. We fixed this by adding the following specifications to Board.java.
+	\begin{lstlisting}
+//@ public invariant \forall int x; x >= 0 && x <
+    items.length; ySize == items[x].length;
+//@ public invariant \nonnullelements (items);
+//@ public invariant \forall int x; x >= 0 && x <
+    items.length; \nonnullelements(items[x]);	
+	\end{lstlisting}
+	Here we state that every item can not be \texttt{null}. Same goes for all the items in the sub-array. Next we state that the \texttt{ySize} needs to be equal to \texttt{items[x].length} when $x$ is between zero and \texttt{items.length}. 
+	\newline
+	We did not encounter any more errors afterwards in the \texttt{WonGame} method. However still some errors occured in the \texttt{MovePlayer(Position)} method when static checked. This is acceptable since this method is fully checked during runtime without any errors. Due to the complexity of the method and the specification we are not sure how to solve these erros given by the static checker at the \texttt{MovePlayer(Position)} method.
+	
+	If we would get a similar assignment in which we had to specify loop invariants we would probably do it the same way. In the case of multiple loops we would works from inside out, starting with most inner loop, annotating it, moving on the the loop around it. In each of these iterations you would reason about what will make the check either true or false and turn this into loop invariants together with the limiting invariants and decreases.
 	
 	\section{Test Generation}
 	
