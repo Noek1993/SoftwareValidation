@@ -28,12 +28,15 @@ final class Game {
        (hint - repeating some invariants stated in Board might speed up ESC on wonGame) */
   
   /** @informal based on valid parameters the constructor creates a valid game object */
+  //@ assignable this.board;
+  //@ assignable this.player;
   Game ( /*@ non_null @*/ Board board, /*@ non_null @*/ Player player) {
     this.board = board;
     this.player = player;
   }
 
   /** @informal Check precisely for the win situation */
+  //@ assignable \nothing;
   //@ ensures \result == (\forall int x; x >= 0 && x < board.xSize; (\forall int y; y >= 0 && y < board.ySize; board.items[x][y].marked ==> board.items[x][y].crate));
   /*@ pure @*/ boolean wonGame () {
     boolean result = true;
