@@ -6,6 +6,8 @@
 \usepackage{graphicx}
 \usepackage[colorinlistoftodos]{todonotes}
 \usepackage{listings}
+\addtolength{\textwidth}{1in}
+\addtolength{\oddsidemargin}{-.5in}
 
 \title{System Validation 2016 \\ Homework Part 1 - JML}
 
@@ -22,19 +24,79 @@ This homework assignment is done for the course System Validation. Here has been
 
 \section{Array Requirements}
 The first exercise relates to the array specification exercise as given in the first exercise session of the course. Below all informal requirements are given and a JML specification to solve this.
-Consider an array $B$ with $n$ elements: $B[0], . . . , B[n-1]$.
+\begin{itemize}
+\item Consider an array $B$ with $n$ elements: $B[0], . . . , B[n-1]$.
 All elements in $B$ are integers. Let $j$, $k$ be two indices such that $0 \leq j < k < n$.
-With $B[j], . . . , B[k]$ we denote the segment of $B$ starting from index $j$ and ending with index $k$.
+With $B[j], . . . , B[k]$ we denote the segment of $B$ starting from index $j$ and ending with index $k$. Which is in JML specifications
 \begin{lstlisting}
-	/*@ spec_public */ private int[] B;	// The array
-	/*@ spec_public */ private int n;	// Lenght of the array
-	/*@ spec_public */ private int j;	// Index start
-	/*@ spec_public */ private int k;	// Index end
+/*@ spec_public */ private int[]B;	// The array
+/*@ spec_public */ private int n;	// Lenght of the array
+/*@ spec_public */ private int j;	// Index start
+/*@ spec_public */ private int k;	// Index end
 	
-	//@ public invariant j >= 0 && j < k && k < n;
+//@ public invariant j >= 0 && j < k && k < n;
 \end{lstlisting}
-\section{JML Annotations and Runtime Assertion Checking}
 
+	\item Any value that occurs in the segment $B[j], . . . ,B[k]$ also occurs outside that segment.
+	\begin{lstlisting}
+//@ public invariant (\forall int i1; i1 >= j && i1 <= k;
+(\exists int i2; (i2 >= 0 && i2 < j) || (i2 > k && i2 < n); B[i1] == B[i2]));
+	\end{lstlisting}
+	This is checked by going over this segment and see if there is a match for every element outside of $B[j], . . . , B[k]$
+	
+	\item The array $B$ does not contain duplicates when the segment $B[j], . . . , B[k]$ is not considered.
+	\begin{lstlisting}
+//@ public invariant (\forall int i1, i2; i1 >= 0 && i2 > i1 && i2 < n;
+(B[i1] == B[i2]) ==> ((i1 >= j && i1 <= k) || (i2 >= j && i2 <= k)));
+	\end{lstlisting}
+	If there are two elements who are duplicates of each other it must mean one of the elements is inbetween $B[j], . . . , B[k]$.
+
+	\item Any value occurs at most twice in B.
+	\begin{lstlisting}
+//@ public invariant (\forall int i1,i2,i3; i1>=0 && i2>i1 && i3>i2 && i3<n;
+B[i1] != B[i2] || B[i2] != B[i3] || B[i1] != B[i3]);	
+	\end{lstlisting}
+	If you have three values at least two values can not be equal to eachother.
+	
+	\item The highest value occuring in B occurs at least twice in B.
+	\begin{lstlisting}
+//@ public invariant (\exists int i1, i2; i1 >= 0 && i2 > i1 && i2 < n;
+B[i1] == B[i2] && (\forall int i3; i3 >= 0 && i3 < n; B[i1] >= B[i3]));	
+	\end{lstlisting}
+	First we check if two elements are the same. If so we check for all other elements if they are equal or higher then those elements.
+	
+	\item The array B contains a palindrome of length k.
+	\begin{lstlisting}
+//@ public invariant (\exists int i1, i2; i1 >= 0 && i2 == (i1+k-1) && i2 < n;
+(\forall int i3; i3 >= 0 && i3 < k; B[i1 + i3] == B[i2 - i3]));	
+	\end{lstlisting}
+	Index i1 and i2 are a segement with lenght k, after this we check for the palindrome. We consider the segment i1,i2 a sub array. We use two indices to check from back to front and the other way around. For every possible itteration the elements for these indices should be the same.
+\end{itemize}
+
+\section{JML Annotations and Runtime Assertion Checking}
+The goal in this part of the assignment was to turn informal requirements into JML specifications, these were marked with \texttt{@informal} in the inline comments in the code. \\
+The following problems were found during runtime checking:
+\begin{itemize}
+	\item Players could move through walls.
+	\item Diagonal movement was a valid next position.
+	\item The current position is a valid next position.
+\end{itemize}
+The first problem found was that players had the ability to move through walls. This problem was detected both visually and by the JML checker. The problem occurs in the \texttt{class Game} inside the method \texttt{boolean movePlayer (Position newPosition)}. This class method has a list of mutiple JML specifications for 6 different situations. The following specification detected the problem:
+\begin{lstlisting}
+//@ requires !board.items[newPosition.x][newPosition.y].ground;
+//@ ensures \result == false;
+\end{lstlisting}
+This states that a move to a position that is not ground is not a valid move and will not be executed. At runtime it was found that this was not the case and that a player was able to move to a position that is not ground. After adding an check in \texttt{boolean movePlayer (Position newPosition)} which validates that the \texttt{newPosition} should be on a ground position the code functions according to the specification.
+
+The next problem was ability of the player to move diagonally to another position. This is in contract with the specification which states: \textbf{\textit{a valid next position is always one move horizontally or vertically from the current one}}. As the previous problem this was also detected visually and by the JML checker. This problem was detected in the \texttt{class Position} in the method \texttt{boolean isValidNextPosition (Position newPosition)}. Part of the JML specification is as follows:
+\begin{lstlisting}
+//@ requires Math.abs(newPosition.x - x) + 
+		Math.abs(newPosition.y - y) == 1;
+//@ ensures \result == true;
+\end{lstlisting}
+There also is an additional part in which the requires expression is not equal to 1, in that case it should return false. By changing the way the method checks if a position is valid of not this problem was was repaired.
+
+The final problem was discovered based on the same specification as the second problem. According the code the current position of the player was also a valid next position, but according to the specification this is not the case. This problem was solved when the second problem was solved.
 
 \section{Static Checking}
 
