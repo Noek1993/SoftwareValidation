@@ -33,8 +33,23 @@ With $B[j], . . . , B[k]$ we denote the segment of $B$ starting from index $j$ a
 	
 	//@ public invariant j >= 0 && j < k && k < n;
 \end{lstlisting}
-\section{JML Annotations and Runtime Assertion Checking}
 
+\section{JML Annotations and Runtime Assertion Checking}
+The goal in this part of the assignment was to turn informal requirements into JML specifications, these were marked with \texttt{@informal} in the inline comments in the code. \newline
+The following problems were found during runtime checking:
+\begin{itemize}
+	\item Players could move through walls.
+	\item Diagonal movement was a valid next position.
+	\item The current position is a valid next position.
+\end{itemize}
+The first problem found was that players had the ability to move through walls. This problem was detected both visually and by the JML checker. The problem occurs in the \texttt{class Game} inside the method \texttt{boolean movePlayer (Position newPosition)}. This class method has a list of mutiple JML specifications for 6 different situations. The following specification detected the problem:
+\begin{lstlisting}
+	  //@ requires !board.items[newPosition.x][newPosition.y].ground;
+	  //@ ensures \result == false;
+\end{lstlisting}
+This states that a move to a position that is not ground is not a valid move and will not be executed. At runtime it was found that this was not the case and that a player was able to move to a position that is not ground.
+
+The next problem was ability of the player to move diagonally to another position. This is in contract with the specification which states: \textbf{\textit{a valid next position is always one move horizontally or vertically from the current one}}.
 
 \section{Static Checking}
 
