@@ -251,7 +251,7 @@ Math.abs(newPosition.y - y) == 1;
 //@ decreases board.ySize - y;
 	\end{lstlisting}
 	
-	A problem we encountered during the implementation of the nested \texttt{forall} loop was the nonzero error. Within the loop elements could not be zero. We fixed this by adding the following specifications to Board.java.
+	A problem we encountered during the implementation of the nested \texttt{forall} loop was the nonzero error. Within the loop elements could not be zero. We fixed this by adding the following specifications to \texttt{Board.java}.
 	\begin{lstlisting}
 //@ public invariant \forall int x; x >= 0 && x <
     items.length; ySize == items[x].length;
@@ -261,7 +261,7 @@ Math.abs(newPosition.y - y) == 1;
 	\end{lstlisting}
 	Here we state that every item can not be \texttt{null}. Same goes for all the items in the sub-array. Next we state that the \texttt{ySize} needs to be equal to \texttt{items[x].length} when $x$ is between zero and \texttt{items.length}. 
 	\newline
-	We did not encounter any more errors afterwards in the \texttt{WonGame} method. However still some errors occured in the \texttt{MovePlayer(Position)} method when static checked. This is acceptable since this method is fully checked during runtime without any errors. Due to the complexity of the method and the specification we are not sure how to solve these erros given by the static checker at the \texttt{MovePlayer(Position)} method.
+	We did not encounter any more errors afterwards in the \texttt{wonGame()} method. However still some errors occurred in the \texttt{movePlayer(Position)} method when static checked. This is acceptable since this method is fully checked during runtime without any errors. Due to the complexity of the method and the specification we are not sure how to solve these errors given by the static checker at the \texttt{movePlayer(Position)} method.
 	
 	If we would get a similar assignment in which we had to specify loop invariants we would probably do it the same way. In the case of multiple loops we would works from inside out, starting with most inner loop, annotating it, moving on the the loop around it. In each of these iterations you would reason about what will make the check either true or false and turn this into loop invariants together with the limiting invariants and decreases.
 	
