@@ -99,6 +99,7 @@ B[i3-1] <= B[i3] || (i3 == i1 && B[i3-1] <= B[i2]) ||
 	The goal in this part of the assignment was to turn informal requirements into JML specifications, these were marked with \texttt{@informal} in the inline comments in the code. For doing this we mainly used \texttt{invariant, requires, ensures} and \texttt{assignable} were mostly used to create the JML specifications. Only in the \texttt{boolean movePlayer (Position newPosition)} method \texttt{assert} is used to create assertion in methods itself. This part is split up into 2 parts, the JML annotations and the runtime assertion checkers. In the first part the most important annotations are shown per class, less interesting or basic annotations are only briefly mentioned. In the runtime assertion checking part the results of runing the program with these annotation is discussed.
 
 	\subsection{JML Annotations}
+	\label{subsec:jmlspec}
 	\subsubsection{Position}
 	The first assertions added are in the \texttt{class Position}, these are used mainly for checking if a positions is valid. This firstly includes invariants that state that x and y are always 0 or more. Similar assertions are used for checking the input in the constructor.
 	\begin{lstlisting}
@@ -265,7 +266,35 @@ Math.abs(newPosition.y - y) == 1;
 	If we would get a similar assignment in which we had to specify loop invariants we would probably do it the same way. In the case of multiple loops we would works from inside out, starting with most inner loop, annotating it, moving on the the loop around it. In each of these iterations you would reason about what will make the check either true or false and turn this into loop invariants together with the limiting invariants and decreases.
 	
 	\section{Test Generation}
+	The goal of this part of the exercise was generate tests for the JML specifications and provide test data to feed these generates tests.
+	For this part of the exercise we did not create any additional JML annotations in the code as we did already create the required specification in \ref{subsec:jmlspec} \textit{JML Annotations and Runtime Assertion Checking: JML Annotations}.
+	The first created a set of different \texttt{Game} objects with a \texttt{Board} and \texttt{Player}, each \texttt{Game} object was created for a different situation, those are summed below:
+	\begin{itemize}
+		\item moving to ground position
+		\item moving to a marked ground position
+		\item moving to a wall position
+		\item moving towards a wall in different situations
+		\begin{itemize}
+			\item a wall with ground behind it
+			\item a wall with marked ground behind it
+			\item a wall with a wall behind it
+			\item a wall with an other box behind it
+		\end{itemize}
+	\end{itemize}
+	All the \texttt{Board}s had a size of 7 by 7 with the player starting in the center.
 	
+	The next step was to create position data to feed to the \texttt{movePlayer(Position newPosition)}. For this we just created all possible combination for $x$ and $y$ with the value 0 to 7(inclusive), resulting in 64 positions. This means that we provide more positions then the test boards contains. By using these positions we also run all kinds different scenarios such as diagonal movement, movement too far away and movement to invalid positions. No negative positions were used as this is in conflict with the specification of \texttt{Position}. We ended up with 196 successfully completed tests.
 	
+	\begin{figure}[h]
+		\centering
+		\includegraphics[]{Sokoban.png}
+		\caption{A test board for Sokoban (crates)}
+	\end{figure}
+
+	\begin{figure}
+		\centering
+		\includegraphics[]{Sokobanwin.png}
+		\caption{Sokoban win}
+	\end{figure}
 	
 \end{document}
