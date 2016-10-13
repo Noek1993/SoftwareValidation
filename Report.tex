@@ -234,7 +234,22 @@ Math.abs(newPosition.y - y) == 1;
 	\label{Static Checking}
 	Within this section we will perform formal verification on the method \texttt{wonGame} in the \texttt{Game} class. The \texttt{wonGame} method is responsible for checking the winning situation on the game board after every move.
 	\newline 
-	We impelemented four \texttt{loop invariants}, two per for loop. One describing if the $x$ or $y$ element was within the correct boundaries, the other is a nested \texttt{forall} loop checking the result. 
+	We implemented four \texttt{loop invariants}, two per for loop. One describing if the $x$ or $y$ element was within the correct boundaries, the other is a nested \texttt{forall} loop checking the result. The loop invariant for the outer loop iterating of the $x$ was as following:
+	\begin{lstlisting}
+//@ loop_invariant x >= 0 && x <= board.xSize;
+//@ loop_invariant result == \forall int i; i >= 0 && i < x; 
+	(\forall int j; j >= 0 && j < board.ySize; 
+		!board.items[i][j].marked || board.items[i][j].crate);
+//@ decreases board.xSize - x;
+	\end{lstlisting}
+	The loop invariant for the inner loop iterating of the $y$ was as following:
+	\begin{lstlisting}
+//@ loop_invariant y >= 0 && y <= board.ySize;
+//@ loop_invariant rowresult == (\forall int i; i >= 0 && i < y; 
+	!board.items[x][i].marked || board.items[x][i].crate);
+//@ decreases board.ySize - y;
+	\end{lstlisting}
+	
 	A problem we encountered during the implementation of the nested \texttt{forall} loop was the nonzero error. Within the loop elements could not be zero. We fixed this by adding the following specifications to Board.java.
 	\begin{lstlisting}
 //@ public invariant \forall int x; x >= 0 && x <
@@ -246,6 +261,8 @@ Math.abs(newPosition.y - y) == 1;
 	Here we state that every item can not be \texttt{null}. Same goes for all the items in the sub-array. Next we state that the \texttt{ySize} needs to be equal to \texttt{items[x].length} when $x$ is between zero and \texttt{items.length}. 
 	\newline
 	We did not encounter any more errors afterwards in the \texttt{WonGame} method. However still some errors occured in the \texttt{MovePlayer(Position)} method when static checked. This is acceptable since this method is fully checked during runtime without any errors. Due to the complexity of the method and the specification we are not sure how to solve these erros given by the static checker at the \texttt{MovePlayer(Position)} method.
+	
+	If we would get a similar assignment in which we had to specify loop invariants we would probably do it the same way. In the case of multiple loops we would works from inside out, starting with most inner loop, annotating it, moving on the the loop around it. In each of these iterations you would reason about what will make the check either true or false and turn this into loop invariants together with the limiting invariants and decreases.
 	
 	\section{Test Generation}
 	
