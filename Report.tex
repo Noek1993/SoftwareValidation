@@ -74,7 +74,7 @@ B[i1] == B[i2] && (\forall int i3; i3 >= 0 && i3 < n; B[i1] >= B[i3]));
 \end{itemize}
 
 \section{JML Annotations and Runtime Assertion Checking}
-The goal in this part of the assignment was to turn informal requirements into JML specifications, these were marked with \texttt{@informal} in the inline comments in the code. \newline
+The goal in this part of the assignment was to turn informal requirements into JML specifications, these were marked with \texttt{@informal} in the inline comments in the code. \\
 The following problems were found during runtime checking:
 \begin{itemize}
 	\item Players could move through walls.
@@ -83,12 +83,20 @@ The following problems were found during runtime checking:
 \end{itemize}
 The first problem found was that players had the ability to move through walls. This problem was detected both visually and by the JML checker. The problem occurs in the \texttt{class Game} inside the method \texttt{boolean movePlayer (Position newPosition)}. This class method has a list of mutiple JML specifications for 6 different situations. The following specification detected the problem:
 \begin{lstlisting}
-	  //@ requires !board.items[newPosition.x][newPosition.y].ground;
-	  //@ ensures \result == false;
+//@ requires !board.items[newPosition.x][newPosition.y].ground;
+//@ ensures \result == false;
 \end{lstlisting}
-This states that a move to a position that is not ground is not a valid move and will not be executed. At runtime it was found that this was not the case and that a player was able to move to a position that is not ground.
+This states that a move to a position that is not ground is not a valid move and will not be executed. At runtime it was found that this was not the case and that a player was able to move to a position that is not ground. After adding an check in \texttt{boolean movePlayer (Position newPosition)} which validates that the \texttt{newPosition} should be on a ground position the code functions according to the specification.
 
-The next problem was ability of the player to move diagonally to another position. This is in contract with the specification which states: \textbf{\textit{a valid next position is always one move horizontally or vertically from the current one}}.
+The next problem was ability of the player to move diagonally to another position. This is in contract with the specification which states: \textbf{\textit{a valid next position is always one move horizontally or vertically from the current one}}. As the previous problem this was also detected visually and by the JML checker. This problem was detected in the \texttt{class Position} in the method \texttt{boolean isValidNextPosition (Position newPosition)}. Part of the JML specification is as follows:
+\begin{lstlisting}
+//@ requires Math.abs(newPosition.x - x) + 
+		Math.abs(newPosition.y - y) == 1;
+//@ ensures \result == true;
+\end{lstlisting}
+There also is an additional part in which the requires expression is not equal to 1, in that case it should return false. By changing the way the method checks if a position is valid of not this problem was was repaired.
+
+The final problem was discovered based on the same specification as the second problem. According the code the current position of the player was also a valid next position, but according to the specification this is not the case. This problem was solved when the second problem was solved.
 
 \section{Static Checking}
 
