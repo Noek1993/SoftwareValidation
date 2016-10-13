@@ -10,6 +10,7 @@ final class Player
   public Position position;
 
   /** @informal based on valid parameters the constructor creates a valid player object */
+  //@ assignable this.position;
   //@ ensures this.position.equals (position);
   Player (Position position) {
     this.position = position;
@@ -17,6 +18,7 @@ final class Player
 
 
   /** @informal a player can only change position to a valid new position */
+  //@ assignable position;
   //@ requires position.isValidNextPosition (newPosition);
   public void setPosition (Position newPosition) {
 	    this.position = newPosition;

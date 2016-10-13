@@ -10,6 +10,8 @@ final class Position
   /*@ spec_public @*/final int y;
 
   /** @informal based on valid parameters the constructor creates a valid position object */
+  //@ assignable this.x;
+  //@ assignable this.y;
   //@ requires x >= 0 && y >= 0;
   //@ ensures x == this.x && y == this.y;
   Position (int x, int y) {
@@ -18,9 +20,11 @@ final class Position
   }
 
   /** @informal to be equal positions need to agree on both coordinates */ 
+  //@ assignable \nothing;
   //@ requires o instanceof Position;
   //@ ensures \result == (((Position) o).x == x && ((Position) o).y == y);
   //@ also
+  //@ assignable \nothing;
   //@ requires !(o instanceof Position);
   //@ ensures \result == false;
   public boolean equals (Object o) {
@@ -34,9 +38,11 @@ final class Position
   // This one is fixed, previously the same square or squares 1 diagonal step away were also valid
   /** @informal a valid next position is always one move horizontally
    *    or vertically from the current one */
+  //@ assignable \nothing;
   //@ requires Math.abs(newPosition.x - x) + Math.abs(newPosition.y - y) == 1;
   //@ ensures \result == true;
   //@ also
+  //@ assignable \nothing;
   //@ requires Math.abs(newPosition.x - x) + Math.abs(newPosition.y - y) != 1;
   //@ ensures \result == false;
   /*@ spec_public @*/

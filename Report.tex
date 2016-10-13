@@ -6,6 +6,8 @@
 \usepackage{graphicx}
 \usepackage[colorinlistoftodos]{todonotes}
 \usepackage{listings}
+\addtolength{\textwidth}{1in}
+\addtolength{\oddsidemargin}{-.5in}
 
 \title{System Validation 2016 \\ Homework Part 1 - JML}
 
@@ -22,17 +24,54 @@ This homework assignment is done for the course System Validation. Here has been
 
 \section{Array Requirements}
 The first exercise relates to the array specification exercise as given in the first exercise session of the course. Below all informal requirements are given and a JML specification to solve this.
-Consider an array $B$ with $n$ elements: $B[0], . . . , B[n-1]$.
+\begin{itemize}
+\item Consider an array $B$ with $n$ elements: $B[0], . . . , B[n-1]$.
 All elements in $B$ are integers. Let $j$, $k$ be two indices such that $0 \leq j < k < n$.
-With $B[j], . . . , B[k]$ we denote the segment of $B$ starting from index $j$ and ending with index $k$.
+With $B[j], . . . , B[k]$ we denote the segment of $B$ starting from index $j$ and ending with index $k$. Which is in JML specifications
 \begin{lstlisting}
-	/*@ spec_public */ private int[] B;	// The array
-	/*@ spec_public */ private int n;	// Lenght of the array
-	/*@ spec_public */ private int j;	// Index start
-	/*@ spec_public */ private int k;	// Index end
+/*@ spec_public */ private int[]B;	// The array
+/*@ spec_public */ private int n;	// Lenght of the array
+/*@ spec_public */ private int j;	// Index start
+/*@ spec_public */ private int k;	// Index end
 	
-	//@ public invariant j >= 0 && j < k && k < n;
+//@ public invariant j >= 0 && j < k && k < n;
 \end{lstlisting}
+
+	\item Any value that occurs in the segment $B[j], . . . ,B[k]$ also occurs outside that segment.
+	\begin{lstlisting}
+//@ public invariant (\forall int i1; i1 >= j && i1 <= k;
+(\exists int i2; (i2 >= 0 && i2 < j) || (i2 > k && i2 < n); B[i1] == B[i2]));
+	\end{lstlisting}
+	This is checked by going over this segment and see if there is a match for every element outside of $B[j], . . . , B[k]$
+	
+	\item The array $B$ does not contain duplicates when the segment $B[j], . . . , B[k]$ is not considered.
+	\begin{lstlisting}
+//@ public invariant (\forall int i1, i2; i1 >= 0 && i2 > i1 && i2 < n;
+(B[i1] == B[i2]) ==> ((i1 >= j && i1 <= k) || (i2 >= j && i2 <= k)));
+	\end{lstlisting}
+	If there are two elements who are duplicates of each other it must mean one of the elements is inbetween $B[j], . . . , B[k]$.
+
+	\item Any value occurs at most twice in B.
+	\begin{lstlisting}
+//@ public invariant (\forall int i1,i2,i3; i1>=0 && i2>i1 && i3>i2 && i3<n;
+B[i1] != B[i2] || B[i2] != B[i3] || B[i1] != B[i3]);	
+	\end{lstlisting}
+	If you have three values at least two values can not be equal to eachother.
+	
+	\item The highest value occuring in B occurs at least twice in B.
+	\begin{lstlisting}
+//@ public invariant (\exists int i1, i2; i1 >= 0 && i2 > i1 && i2 < n;
+B[i1] == B[i2] && (\forall int i3; i3 >= 0 && i3 < n; B[i1] >= B[i3]));	
+	\end{lstlisting}
+	First we check if two elements are the same. If so we check for all other elements if they are equal or higher then those elements.
+	
+	\item The array B contains a palindrome of length k.
+	\begin{lstlisting}
+//@ public invariant (\exists int i1, i2; i1 >= 0 && i2 == (i1+k-1) && i2 < n;
+(\forall int i3; i3 >= 0 && i3 < k; B[i1 + i3] == B[i2 - i3]));	
+	\end{lstlisting}
+	Index i1 and i2 are a segement with lenght k, after this we check for the palindrome. We consider the segment i1,i2 a sub array. We use two indices to check from back to front and the other way around. For every possible itteration the elements for these indices should be the same.
+\end{itemize}
 
 \section{JML Annotations and Runtime Assertion Checking}
 The goal in this part of the assignment was to turn informal requirements into JML specifications, these were marked with \texttt{@informal} in the inline comments in the code. \newline
