@@ -112,7 +112,7 @@ B[i3-1] <= B[i3] || (i3 == i1 && B[i3-1] <= B[i2]) ||
 //@ requires Math.abs(newPosition.x - x) + Math.abs(newPosition.y - y) != 1;
 //@ ensures \result == false;
 	\end{lstlisting}
-	Assertions are also added to the equals method and to the constructor, in which they state that the x and y values are set to the parameters.
+	Assertions are also added to the equals method and to the constructor, in which they state that the $x$ and $y$ values are set to the parameters.
 	
 	\subsubsection{Player}
 	Assertions added the \texttt{class Player} are all basic. To the constructor assertions are added to state that the position parameter is the same as the position of the player. To \texttt{public void setPosition (Position newPosition)} annotations are added that state the new position is valid and that position of the player equals the parameter.
@@ -140,7 +140,7 @@ B[i3-1] <= B[i3] || (i3 == i1 && B[i3-1] <= B[i2]) ||
 //@ public invariant \forall int x; x >= 0 && x < items.length; 
 		\nonnullelements(items[x]);
 	\end{lstlisting}
-	It is stated that the xSize and xSize need to be equal and both greater then zero, the dimensions of the array need to match the xSize and ySize and finally the elements in the array are not allowed to be null. The last 3 of these annotations are added because of problems that occurred during the Static checking (see \ref{sec:staticchecking}).
+	It is stated that the xSize and ySize need to be equal and both greater then zero, the dimensions of the array need to match the xSize and ySize and finally the elements in the array are not allowed to be \texttt{null}. The last 3 of these annotations are added because of problems that occurred during the Static checking (\ref{sec:staticchecking}).
 	Annotations are added to the constructor to ensure the dimensions are valid and the array is filled with walls.
 	\begin{lstlisting}
 //@ assignable items;
@@ -163,7 +163,7 @@ B[i3-1] <= B[i3] || (i3 == i1 && B[i3-1] <= B[i2]) ||
 //@ requires !onBoard(p);
 //@ ensures \result == false;
 	\end{lstlisting}
-	The annotations for both the \texttt{(Position p)} variant or the \texttt{(int x, int y)} variant are almost thesame, with the only difference to the input variable against which is checked.
+	The annotations for both the \texttt{(Position p)} variant or the \texttt{(int x, int y)} variant are almost the same, with the only difference to the input variable against which is checked.
 	
 	\subsubsection{Game}
 	The most important annotations int \texttt{class Game} are related to the \texttt{boolean wonGame ()} and \texttt{movePlayer (Position newPosition)}. The annotations added to \texttt{boolean wonGame ()} check if the result is true if all marked positions also are a crate. The annotation used in this methods are further explained in \ref{sec:staticchecking} Static Checking.
@@ -231,7 +231,7 @@ Math.abs(newPosition.y - y) == 1;
 	
 	\newpage
 	\section{Static Checking}
-	\label{Static Checking}
+	\label{sec:staticchecking}
 	Within this section we will perform formal verification on the method \texttt{wonGame} in the \texttt{Game} class. The \texttt{wonGame} method is responsible for checking the winning situation on the game board after every move.
 	\newline 
 	We impelemented four \texttt{loop invariants}, two per for loop. One describing if the $x$ or $y$ element was within the correct boundaries, the other is a nested \texttt{forall} loop checking the result. 
