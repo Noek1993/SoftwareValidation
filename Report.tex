@@ -5,6 +5,7 @@
 \usepackage{amsmath}
 \usepackage{graphicx}
 \usepackage[colorinlistoftodos]{todonotes}
+\usepackage{listings}
 
 \title{System Validation 2016 \\ Homework Part 1 - JML}
 
@@ -20,8 +21,18 @@ This homework assignment is done for the course System Validation. Here has been
 \end{abstract}
 
 \section{Array Requirements}
-
-
+The first exercise relates to the array specification exercise as given in the first exercise session of the course. Below all informal requirements are given and a JML specification to solve this.
+Consider an array $B$ with $n$ elements: $B[0], . . . , B[n-1]$.
+All elements in $B$ are integers. Let $j$, $k$ be two indices such that $0 \leq j < k < n$.
+With $B[j], . . . , B[k]$ we denote the segment of $B$ starting from index $j$ and ending with index $k$.
+\begin{lstlisting}
+	/*@ spec_public */ private int[] B;	// The array
+	/*@ spec_public */ private int n;	// Lenght of the array
+	/*@ spec_public */ private int j;	// Index start
+	/*@ spec_public */ private int k;	// Index end
+	
+	//@ public invariant j >= 0 && j < k && k < n;
+\end{lstlisting}
 \section{JML Annotations and Runtime Assertion Checking}
 
 
