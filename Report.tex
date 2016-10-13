@@ -168,8 +168,9 @@ B[i3-1] <= B[i3] || (i3 == i1 && B[i3-1] <= B[i2]) ||
 	\subsubsection{Game}
 	The most important annotations int \texttt{class Game} are related to the \texttt{boolean wonGame ()} and \texttt{movePlayer (Position newPosition)}. The annotations added to \texttt{boolean wonGame ()} check if the result is true if all marked positions also are a crate. The annotation used in this methods are further explained in \ref{sec:staticchecking} Static Checking.
 	\begin{lstlisting}
-//@ ensures \result == (\forall int x; x >= 0 && x < board.xSize; (\forall int y; y >= 0 && y < board.ySize; 
-	board.items[x][y].marked ==> board.items[x][y].crate));
+//@ ensures \result == (\forall int x; x >= 0 && x < board.xSize; 
+	(\forall int y; y >= 0 && y < board.ySize;
+		board.items[x][y].marked ==> board.items[x][y].crate));
 	\end{lstlisting}
 	The annotations to \texttt{movePlayer (Position newPosition)} are the most extensive annotations of the project, other then pre and post conditions multiple assertions are added to the body of the method.
 	\begin{lstlisting}
@@ -191,13 +192,15 @@ B[i3-1] <= B[i3] || (i3 == i1 && B[i3-1] <= B[i2]) ||
 //@ requires board.onBoard(newPosition);
 //@ requires board.items[newPosition.x][newPosition.y].crate;
 //@ requires player.position.isValidNextPosition (newPosition);
-//@ requires board.isOpen(newPosition.x + (newPosition.x - player.position.x), newPosition.y + (newPosition.y - player.position.y));
+//@ requires board.isOpen(newPosition.x + (newPosition.x - player.position.x), 
+	newPosition.y + (newPosition.y - player.position.y));
 //@ ensures \result == true;
 //@ also normal_behaviour
 //@ requires board.onBoard(newPosition);
 //@ requires board.items[newPosition.x][newPosition.y].crate;
 //@ requires player.position.isValidNextPosition (newPosition);
-//@ requires !board.isOpen(newPosition.x + (newPosition.x - player.position.x), newPosition.y + (newPosition.y - player.position.y));
+//@ requires !board.isOpen(newPosition.x + (newPosition.x - player.position.x), 
+	newPosition.y + (newPosition.y - player.position.y));
 //@ ensures \result == false;
 	\end{lstlisting}
 	The annotations check for all the different situations that can happen within the method such as invalid positions, walls, boxes and they can be pushed or not.
