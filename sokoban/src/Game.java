@@ -30,6 +30,8 @@ final class Game {
   /** @informal based on valid parameters the constructor creates a valid game object */
   //@ assignable this.board;
   //@ assignable this.player;
+  //@ ensures this.board == board;
+  //@ ensures this.player == player;
   Game ( /*@ non_null @*/ Board board, /*@ non_null @*/ Player player) {
     this.board = board;
     this.player = player;
@@ -41,11 +43,13 @@ final class Game {
   /*@ pure @*/ boolean wonGame () {
     boolean result = true;
     //@ loop_invariant x >= 0 && x <= board.xSize;
-    //@ loop_invariant result == \forall int i, j; i >= 0 && i < x && j >= 0 && j < board.ySize; !board.items[i][j].marked || board.items[i][j].crate;
+    //@ loop_invariant result == \forall int i; i >= 0 && i < x; (\forall int j; j >= 0 && j < board.ySize; !board.items[i][j].marked || board.items[i][j].crate);
+    //@ decreases board.xSize - x;
     for (int x = 0; result && x < board.xSize; x++) {
         boolean rowresult = true;
         //@ loop_invariant y >= 0 && y <= board.ySize;
         //@ loop_invariant rowresult == (\forall int i; i >= 0 && i < y; !board.items[x][i].marked || board.items[x][i].crate);
+        //@ decreases board.ySize - y;
         for (int y = 0; rowresult && y < board.ySize; y++) {
             if (board.items[x][y].marked && !board.items[x][y].crate) {
               rowresult = false; 
@@ -93,7 +97,7 @@ final class Game {
     }
 
     /** @informal Re-check that the new position is on the board */
-    //@ assert 0 <= newPosition.x && newPosition.x < board.xSize && 0 <= newPosition.y && newPosition.y < board.ySize;
+    //@ assert board.onBoard(newPosition);
 
     // If the new position is not a crate just move
     if (!board.items[newPosition.x][newPosition.y].crate) {
@@ -102,6 +106,7 @@ final class Game {
     }
 
     /** @informal Last case, it has to be crate, check that */
+    //@ assert board.items[newPosition.x][newPosition.y].crate;
 
     // make the move together with the crate if possible */
     int xShift = newPosition.x - player.position.x;
@@ -115,6 +120,7 @@ final class Game {
     if (!board.isOpen(nX, nY)) {
       return false;
     }
+    //@ assert board.isOpen(nX, nY);
 
     // Move the crate, change markings accordingly.
     board.items[newPosition.x][newPosition.y].crate = false; // old position of crate

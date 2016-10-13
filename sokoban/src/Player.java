@@ -20,6 +20,7 @@ final class Player
   /** @informal a player can only change position to a valid new position */
   //@ assignable position;
   //@ requires position.isValidNextPosition (newPosition);
+  //@ ensures this.position.equals (position);
   public void setPosition (Position newPosition) {
 	    this.position = newPosition;
   }

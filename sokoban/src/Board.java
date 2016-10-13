@@ -47,7 +47,7 @@ final class Board {
 
   /** @informal same as above for explicit coordinates */
   //@ assignable \nothing;
-  //@ ensures \result == 0 <= x && x < xSize && 0 <= y && y < ySize;
+  //@ ensures \result == (0 <= x && x < xSize && 0 <= y && y < ySize);
   public /*@ pure @*/ boolean onBoard(int x, int y) {
       return 0 <= x && x < xSize && 0 <= y && y < ySize;
   }

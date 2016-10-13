@@ -27,7 +27,7 @@ final class Position
   //@ assignable \nothing;
   //@ requires !(o instanceof Position);
   //@ ensures \result == false;
-  public boolean equals (Object o) {
+  public /*@ pure @*/ boolean equals (Object o) {
     if (o instanceof Position) {
       Position q = (Position) o;
       return x == q.x && y == q.y;
