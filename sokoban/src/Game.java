@@ -30,6 +30,8 @@ final class Game {
   /** @informal based on valid parameters the constructor creates a valid game object */
   //@ assignable this.board;
   //@ assignable this.player;
+  //@ ensures this.board == board;
+  //@ ensures this.player == player;
   Game ( /*@ non_null @*/ Board board, /*@ non_null @*/ Player player) {
     this.board = board;
     this.player = player;
@@ -42,10 +44,12 @@ final class Game {
     boolean result = true;
     //@ loop_invariant x >= 0 && x <= board.xSize;
     //@ loop_invariant result == \forall int i; i >= 0 && i < x; (\forall int j; j >= 0 && j < board.ySize; !board.items[i][j].marked || board.items[i][j].crate);
+    //@ decreases board.xSize - x;
     for (int x = 0; result && x < board.xSize; x++) {
         boolean rowresult = true;
         //@ loop_invariant y >= 0 && y <= board.ySize;
         //@ loop_invariant rowresult == (\forall int i; i >= 0 && i < y; !board.items[x][i].marked || board.items[x][i].crate);
+        //@ decreases board.ySize - y;
         for (int y = 0; rowresult && y < board.ySize; y++) {
             if (board.items[x][y].marked && !board.items[x][y].crate) {
               rowresult = false; 
