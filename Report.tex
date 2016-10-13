@@ -120,8 +120,23 @@ Math.abs(newPosition.y - y) == 1;
 	
 	The final problem was discovered based on the same specification as the second problem. According the code the current position of the player was also a valid next position, but according to the specification this is not the case. This problem was solved when the second problem was solved.
 	
+	\newpage
 	\section{Static Checking}
-	
+	\label{Static Checking}
+	Within this section we will perform formal verification on the method \texttt{wonGame} in the \texttt{Game} class. The \texttt{wonGame} method is responsible for checking the winning situation on the game board after every move.
+	\newline 
+	We impelemented four \texttt{loop invariants}, two per for loop. One describing if the $x$ or $y$ element was within the correct boundaries, the other is a nested \texttt{forall} loop checking the result. 
+	A problem we encountered during the implementation of the nested \texttt{forall} loop was the nonzero error. Within the loop elements could not be zero. We fixed this by adding the following specifications to Board.java.
+	\begin{lstlisting}
+//@ public invariant \forall int x; x >= 0 && x <
+    items.length; ySize == items[x].length;
+//@ public invariant \nonnullelements (items);
+//@ public invariant \forall int x; x >= 0 && x <
+    items.length; \nonnullelements(items[x]);	
+	\end{lstlisting}
+	Here we state that every item can not be \texttt{null}. Same goes for all the items in the sub-array. Next we state that the \texttt{ySize} needs to be equal to \texttt{items[x].length} when $x$ is between zero and \texttt{items.length}. 
+	\newline
+	We did not encounter any more errors afterwards in the \texttt{WonGame} method. However still some errors occured in the \texttt{MovePlayer(Position)} method when static checked. This is acceptable since this method is fully checked during runtime without any errors. Due to the complexity of the method and the specification we are not sure how to solve these erros given by the static checker at the \texttt{MovePlayer(Position)} method.
 	
 	\section{Test Generation}
 	
