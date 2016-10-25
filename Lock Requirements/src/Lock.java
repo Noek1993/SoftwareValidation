@@ -1,26 +1,48 @@
 public class Lock {
 
-	void Openleftdoor() {
+	//@ invariant waterLevelLock > 0;
+	//@ invariant waterLevelLock > 5;
+	
+	//@ invariant shipsInLock == 0 || shipsInLock == 1;
+	
+	float waterLevelLock;
+	float waterLevelRight;
+	float waterLevelLeft;
+	boolean rightDoorOpen;
+	boolean leftDoorOpen;
+	int shipsWaitingRight;
+	int shipsWaitingLeft;
+	int shipsInLock;
+	boolean shipBetweenDoors; // The ship being in an open door
+	
+	//@ requires waterLevelLock >= waterLevelLeft;
+	//@ requires !rightDoorOpen;
+	void OpenLeftDoor() {
 
 	}
 
-	void Closeleftdoor() {
+	//@ requires !shipBetweenDoors;
+	void CloseLeftDoor() {
 
 	}
 
-	void Openrightdoor() {
+	//@ requires waterLevelLock >= waterLevelRight;
+	//@ requires !leftDoorOpen;
+	void OpenRightDoor() {
 
 	}
 
-	void Closerightdoor() {
+	//@ requires !shipBetweenDoors;
+	void CloseRightDoor() {
 
 	}
 
-	void Raisewater() {
+	//@ requires shipsInLock == 1;
+	void RaiseWater() {
 
 	}
 
-	void Lowerwater() {
+	void LowerWater() {
 
 	}
 
