@@ -1,0 +1,21 @@
+MODULE main
+VAR
+  left_door : {open, closed, opening, closing};
+  right_door : {open, closed, opening, closing};
+  audio_signal : {on, off};
+  boat_location : {left, right, entering_left, entering_right, in_lock};
+
+// Boats should be able to get to the other side of the lock.
+LTLSPEC boat_location = left & next(boat_location = entering_left) -> F boat_location = right;
+LTLSPEC boat_location = right & next(boat_location = entering_right) -> F boat_location = left;
+
+// There should be an audio signal whenever the gate opens or closes.
+LTLSPEC left_door = opening -> F audio_signal = on;
+LTLSPEC left_door = closing -> F audio_signal = on;
+LTLSPEC right_door = opening -> F audio_signal = on;
+LTLSPEC right_door = closing -> F audio_signal = on;
+
+// When a boat has entered, the doors should close.
+LTLSPEC boat_location = entering_left && next(boat_location = in_lock) -> F (left_door = closed & right_door = closed);
+LTLSPEC boat_location = entering_right && next(boat_location = in_lock) -> F (left_door = closed & right_door = closed);
+
