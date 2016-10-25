@@ -6,4 +6,83 @@
 CTLSPEC EF T3A_occupied
 CTLSPEC EF T3B_occupied
 
+--// Each signal has to be red or green but can not be both
+LTLSPEC G((S1A_red | S1A_green) & !(S1A_red & S1A_green))
+LTLSPEC G((S2A_red | S2A_green) & !(S2A_red & S2A_green))
+LTLSPEC G((S3A_red | S3A_green) & !(S3A_red & S3A_green))
+LTLSPEC G((S4A_red | S4A_green) & !(S4A_red & S4A_green))
+LTLSPEC G((S1B_red | S1B_green) & !(S1B_red & S1B_green))
+LTLSPEC G((S2B_red | S2B_green) & !(S2B_red & S2B_green))
+LTLSPEC G((S3B_red | S3B_green) & !(S3B_red & S3B_green))
+LTLSPEC G((S4B_red | S4B_green) & !(S4B_red & S4B_green))
+
+--// Signal shows red if passing the signal is not save, because of occupied tracks or unlocked points
+--// S2A
+LTLSPEC G((S2A_red & P1A_locked_straight) -> (T2A_occupied | T3A_occupied))
+LTLSPEC G((S2A_red & P1A_locked_curved) -> (!P2B_locked_curved | T2A_occupied | T3B_occupied | T4B_occupied))
+LTLSPEC G((!P1A_locked_curved & !P1A_locked_straight) -> S2A_red)
+
+--// S2B
+LTLSPEC G((S2B_red & P1B_locked_straight) -> (T2B_occupied | T3B_occupied))
+LTLSPEC G((S2B_red & P1B_locked_curved) -> (!P2A_locked_curved | T2B_occupied | T3A_occupied | T4A_occupied))
+LTLSPEC G((!P1B_locked_curved & !P1B_locked_straight) -> S2B_red)
+
+--// S3A
+LTLSPEC G(!P1A_locked_straight -> S3A_red)
+LTLSPEC G((S3A_red & P1A_locked_straight) -> (T1A_occupied | T2A_occupied))
+
+--// S3B
+LTLSPEC G(!P1B_locked_straight -> S3B_red)
+LTLSPEC G((S3B_red & P1B_locked_straight) -> (T1B_occupied | T2B_occupied))
+
+--// S4A
+LTLSPEC G((S4A_red & P2A_locked_straight) -> T4A_occupied)
+LTLSPEC G((S4A_red & P2A_locked_curved) -> (!P1B_locked_curved | T2B_occupied | T1B_occupied | T4A_occupied))
+LTLSPEC G((!P2A_locked_straight & !P2A_locked_curved) -> S4A_red)
+
+--// S4B
+LTLSPEC G((S4B_red & P2B_locked_straight) -> T4B_occupied)
+LTLSPEC G((S4B_red & P2B_locked_curved) -> (!P1A_locked_curved | T2A_occupied | T1A_occupied | T4B_occupied))
+LTLSPEC G((!P2B_locked_straight & !P2B_locked_curved) -> S4B_red)
+
+--// The system never issues conflicting commands
+LTLSPEC G(P1A_goal_curved <-> P2B_goal_curved)
+LTLSPEC G(P1A_goal_straight <-> P2B_goal_straight)
+
+LTLSPEC G(P1B_goal_curved <-> P2A_goal_curved)
+LTLSPEC G(P1B_goal_straight <-> P2A_goal_straight)
+
+--// The points always follow the given commands
+LTLSPEC P1A_goal_curved -> F(P1A_locked_curved)
+LTLSPEC P1A_goal_straight -> F(P1A_locked_straight)
+
+LTLSPEC P1B_goal_curved -> F(P1B_locked_curved)
+LTLSPEC P1B_goal_straight -> F(P1B_locked_straight)
+
+LTLSPEC P2A_goal_curved -> F(P2A_locked_curved)
+LTLSPEC P2A_goal_straight -> F(P2A_locked_straight)
+
+LTLSPEC P2B_goal_curved -> F(P2B_locked_curved)
+LTLSPEC P2B_goal_straight -> F(P2B_locked_straight)
+
+--// Trains always make progress
+LTLSPEC (T1A_occupied & X (T2A_occupied)) -> ( X X T3A_occupied | X X T4B_occupied)
+LTLSPEC (T2A_occupied & X (T3A_occupied)) -> ( X X T4A_occupied)
+LTLSPEC (T3A_occupied & X (T4A_occupied)) -> ( X X T2B_occupied)
+LTLSPEC (T4A_occupied & X (T2B_occupied)) -> ( X X T1B_occupied)
+LTLSPEC (T2A_occupied & X (T4B_occupied)) -> ( X X T3B_occupied)
+LTLSPEC (T4B_occupied & X (T3B_occupied)) -> ( X X T2B_occupied)
+LTLSPEC (T3B_occupied & X (T2B_occupied)) -> ( X X T1B_occupied)
+
+LTLSPEC (T1B_occupied & X (T2B_occupied)) -> ( X X T3B_occupied | X X T4A_occupied)
+LTLSPEC (T2B_occupied & X (T3B_occupied)) -> ( X X T4B_occupied)
+LTLSPEC (T3B_occupied & X (T4B_occupied)) -> ( X X T2A_occupied)
+LTLSPEC (T4B_occupied & X (T2A_occupied)) -> ( X X T1A_occupied)
+LTLSPEC (T2B_occupied & X (T4A_occupied)) -> ( X X T3A_occupied)
+LTLSPEC (T4A_occupied & X (T3A_occupied)) -> ( X X T2A_occupied)
+LTLSPEC (T3A_occupied & X (T2A_occupied)) -> ( X X T1A_occupied)
+
+
+
+
 
