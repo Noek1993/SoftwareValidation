@@ -1,23 +1,27 @@
-
 public class Lock {
 
-}
+	void Openleftdoor() {
 
-void Openleftdoor(){
-	
-}
-void Closeleftdoor(){
-	
-}
-void Openrightdoor(){
-	
-}
-void Closerightdoor(){
-	
-}
-void Raisewater(){
-	
-}
-void Lowerwater(){
-	
+	}
+
+	void Closeleftdoor() {
+
+	}
+
+	void Openrightdoor() {
+
+	}
+
+	void Closerightdoor() {
+
+	}
+
+	void Raisewater() {
+
+	}
+
+	void Lowerwater() {
+
+	}
+
 }
