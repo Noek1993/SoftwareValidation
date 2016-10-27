@@ -5,12 +5,11 @@ MODULE Points(goal_straight,goal_curved)
     init(status):=moving;
     next(status):=case
         goal_straight & status=curved   : moving;
-        goal_straight                   : { straight, moving };
+        goal_straight                   : straight;
         goal_curved & status=straight   : moving;
-        goal_curved                     : { curved, moving };        
+        goal_curved                     : curved;        
         TRUE                            : status;
     esac;
-FAIRNESS !(status = moving);
 
 MODULE Train (
         S2A_red,S3A_red,S4A_red,
@@ -78,16 +77,16 @@ MODULE Environment(
     )
     
   DEFINE
-    T1A_occupied := train.location = T1A;
-    T2A_occupied := train.location = T2A;
-    T3A_occupied := train.location = T3A;
-    T4A_occupied := train.location = T4A;
-    T1B_occupied := train.location = T1B;
-    T2B_occupied := train.location = T2B;
-    T3B_occupied := train.location = T3B;
-    T4B_occupied := train.location = T4B;
-    S1A_red   := train.location = T0A; 
-    S1B_red   := train.location = T0B;
+    T1A_occupied := train_1.location = T1A | train_2.location = T1A;
+    T2A_occupied := train_1.location = T2A | train_2.location = T2A;
+    T3A_occupied := train_1.location = T3A | train_2.location = T3A;
+    T4A_occupied := train_1.location = T4A | train_2.location = T4A;
+    T1B_occupied := train_1.location = T1B | train_2.location = T1B;
+    T2B_occupied := train_1.location = T2B | train_2.location = T2B;
+    T3B_occupied := train_1.location = T3B | train_2.location = T3B;
+    T4B_occupied := train_1.location = T4B | train_2.location = T4B;
+    S1A_red   := train_1.location = T0A | train_2.location = T0A;
+    S1B_red   := train_1.location = T0B | train_2.location = T0B;
     S1A_green := !S1A_red;
     S1B_green := !S1B_red;
     P1A_locked_straight := P1A.status=straight;
@@ -104,7 +103,18 @@ MODULE Environment(
     P1B : Points(P1B_goal_straight,P1B_goal_curved);
     P2A : Points(P2A_goal_straight,P2A_goal_curved);
     P2B : Points(P2B_goal_straight,P2B_goal_curved);
-    train : Train(
+    train_1 : Train(
+        S2A_red,S3A_red,S4A_red,
+        S2B_red,S3B_red,S4B_red,
+        S2A_green,S3A_green,S4A_green,
+        S2B_green,S3B_green,S4B_green,
+        S1A_red,S1A_green,S1B_red,S1B_green,
+        P1A_locked_straight,P1A_locked_curved,
+        P1B_locked_straight,P1B_locked_curved,
+        P2A_locked_straight,P2A_locked_curved,
+        P2B_locked_straight,P2B_locked_curved
+    );
+    train_2 : Train(
         S2A_red,S3A_red,S4A_red,
         S2B_red,S3B_red,S4B_red,
         S2A_green,S3A_green,S4A_green,

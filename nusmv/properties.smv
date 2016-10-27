@@ -40,49 +40,53 @@ LTLSPEC G((T4A_occupied & P2A_locked_straight) -> S4A_red)
 LTLSPEC G(((!P1B_locked_curved | T2B_occupied | T1B_occupied | T4A_occupied) & P2A_locked_curved) -> S4A_red)
 LTLSPEC G((!P2A_locked_straight & !P2A_locked_curved) -> S4A_red)
 
---// S4
+--// S4B
 LTLSPEC G((T4B_occupied & P2B_locked_straight) -> S4B_red)
 LTLSPEC G(((!P1A_locked_curved | T2A_occupied | T1A_occupied | T4B_occupied) & P2B_locked_curved) -> S4B_red)
 LTLSPEC G((!P2B_locked_straight & !P2B_locked_curved) -> S4B_red)
 
 --// The system never issues conflicting commands
-LTLSPEC G(P1A_goal_curved <-> P2B_goal_curved)
-LTLSPEC G(P1A_goal_straight <-> P2B_goal_straight)
+LTLSPEC G(P1A_goal_curved -> (P2B_goal_curved | P2B_locked_curved))
+LTLSPEC G(P2B_goal_curved -> (P1A_goal_curved | P1A_locked_curved))
+LTLSPEC G(P1A_goal_straight -> (P2B_goal_straight | P2B_locked_straight))
+LTLSPEC G(P2B_goal_straight -> (P1A_goal_straight | P1A_locked_straight))
 
-LTLSPEC G(P1B_goal_curved <-> P2A_goal_curved)
-LTLSPEC G(P1B_goal_straight <-> P2A_goal_straight)
+LTLSPEC G(P1B_goal_curved -> (P2A_goal_curved | P2A_locked_curved))
+LTLSPEC G(P2A_goal_curved -> (P1B_goal_curved | P1B_locked_curved))
+LTLSPEC G(P1B_goal_straight -> (P2A_goal_straight | P2A_locked_straight))
+LTLSPEC G(P2A_goal_straight -> (P1B_goal_straight | P1B_locked_straight))
 
 --// The points always follow the given commands
-LTLSPEC P1A_goal_curved -> X(P1A_locked_curved)
-LTLSPEC P1A_goal_straight -> X(P1A_locked_straight)
+LTLSPEC G(P1A_goal_curved -> ((P1A_goal_curved U (P1A_locked_curved | P1A_goal_straight)) & F P1A_locked_curved))
+LTLSPEC G(P1A_goal_straight -> (P1A_goal_straight U P1A_locked_straight))
 
-LTLSPEC P1B_goal_curved -> X(P1B_locked_curved)
-LTLSPEC P1B_goal_straight -> X(P1B_locked_straight)
+LTLSPEC G(P1B_goal_curved -> ((P1B_goal_curved U (P1B_locked_curved | P1B_goal_straight)) & F P1B_locked_curved))
+LTLSPEC G(P1B_goal_straight -> (P1B_goal_straight U P1B_locked_straight))
 
-LTLSPEC P2A_goal_curved -> X(P2A_locked_curved)
-LTLSPEC P2A_goal_straight -> X(P2A_locked_straight)
+LTLSPEC G(P2A_goal_curved -> ((P2A_goal_curved U (P2A_locked_curved | P2A_goal_straight)) & F P2A_locked_curved))
+LTLSPEC G(P2A_goal_straight -> (P2A_goal_straight U P2A_locked_straight))
 
-LTLSPEC P2B_goal_curved -> X(P2B_locked_curved)
-LTLSPEC P2B_goal_straight -> X(P2B_locked_straight)
+LTLSPEC G(P2B_goal_curved -> ((P2B_goal_curved U (P2B_locked_curved | P2B_goal_straight)) & F P2B_locked_curved))
+LTLSPEC G(P2B_goal_straight -> (P2B_goal_straight U P2B_locked_straight))
 
 --// Trains always make progress
-LTLSPEC (T1A_occupied & X (T2A_occupied)) -> ( F T3A_occupied | F T4B_occupied)
-LTLSPEC (T2A_occupied & X (T3A_occupied)) -> ( F T4A_occupied)
-LTLSPEC (T3A_occupied & X (T4A_occupied)) -> ( F T2B_occupied)
-LTLSPEC (T4A_occupied & X (T2B_occupied)) -> ( F T1B_occupied)
-LTLSPEC (T2A_occupied & X (T4B_occupied)) -> ( F T3B_occupied)
-LTLSPEC (T4B_occupied & X (T3B_occupied)) -> ( F T2B_occupied)
-LTLSPEC (T3B_occupied & X (T2B_occupied)) -> ( F T1B_occupied)
-LTLSPEC T1A_occupied -> F !T1A_occupied
+LTLSPEC G((T1A_occupied & X (T2A_occupied)) -> ( F T3A_occupied | F T4B_occupied))
+LTLSPEC G((T2A_occupied & X (T3A_occupied)) -> ( F T4A_occupied))
+LTLSPEC G((T3A_occupied & X (T4A_occupied)) -> ( F T2B_occupied))
+LTLSPEC G((T4A_occupied & X (T2B_occupied)) -> ( F T1B_occupied))
+LTLSPEC G((T2A_occupied & X (T4B_occupied)) -> ( F T3B_occupied))
+LTLSPEC G((T4B_occupied & X (T3B_occupied)) -> ( F T2B_occupied))
+LTLSPEC G((T3B_occupied & X (T2B_occupied)) -> ( F T1B_occupied))
+LTLSPEC G(T1A_occupied -> F !T1A_occupied)
 
-LTLSPEC (T1B_occupied & X (T2B_occupied)) -> ( F T3B_occupied | F T4A_occupied)
-LTLSPEC (T2B_occupied & X (T3B_occupied)) -> ( F T4B_occupied)
-LTLSPEC (T3B_occupied & X (T4B_occupied)) -> ( F T2A_occupied)
-LTLSPEC (T4B_occupied & X (T2A_occupied)) -> ( F T1A_occupied)
-LTLSPEC (T2B_occupied & X (T4A_occupied)) -> ( F T3A_occupied)
-LTLSPEC (T4A_occupied & X (T3A_occupied)) -> ( F T2A_occupied)
-LTLSPEC (T3A_occupied & X (T2A_occupied)) -> ( F T1A_occupied)
-LTLSPEC T1B_occupied -> F !T1B_occupied
+LTLSPEC G((T1B_occupied & X (T2B_occupied)) -> ( F T3B_occupied | F T4A_occupied))
+LTLSPEC G((T2B_occupied & X (T3B_occupied)) -> ( F T4B_occupied))
+LTLSPEC G((T3B_occupied & X (T4B_occupied)) -> ( F T2A_occupied))
+LTLSPEC G((T4B_occupied & X (T2A_occupied)) -> ( F T1A_occupied))
+LTLSPEC G((T2B_occupied & X (T4A_occupied)) -> ( F T3A_occupied))
+LTLSPEC G((T4A_occupied & X (T3A_occupied)) -> ( F T2A_occupied))
+LTLSPEC G((T3A_occupied & X (T2A_occupied)) -> ( F T1A_occupied))
+LTLSPEC G(T1B_occupied -> F !T1B_occupied)
 
 --// There is a trace in which T3A is occupied
 CTLSPEC EF T3A_occupied
