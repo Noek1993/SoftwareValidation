@@ -7,22 +7,21 @@ int nondet_int();
 int array[N];
 
 int search(int v, int n) {
-   assert(n == N);
    int first = 0;
    int last = n - 1;
    int middle = (first+last)/2;
    while (first <= last) {
       __CPROVER_assume(first >=0);
-      __CPROVER_assume(last < N);
+      __CPROVER_assume(last < n);
       if (array[middle] < v) {
-         first = middle+2;
+         first = middle+1;
 		} else if (array[middle] == v) {
          return 1;
       } else {
-         last = middle-2;
+         last = middle-1;
       }
       middle = (first+last)/2;
-      assert(middle >= 0 && middle < N);
+      assert(middle >= 0 && middle < n);
    }
    return 0; 
 }
