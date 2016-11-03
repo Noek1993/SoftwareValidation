@@ -19,11 +19,117 @@
 	\maketitle
 	
 	\begin{abstract}
-		This homework assignment is done for the course System Validation. 
+		This homework assignment is done for the course System Validation. Here has been practised with Model checking through Temporal Logic, NuSMV and SatAbs. In the first part formal requirements were generated for a water lock. In the second part an interlocking system for railway tracks is formalized with the help op NuSMV. Finally a simple array out-of-bounds violations are checked with SatAbs. 
 	\end{abstract}
 	
 	\section{Lock Requirements}
-
+	The first exercise relates to the lock specification exercise as given in the first exercise session of the course. Below all informal requirements are given and a JML or temporal logic specification to solve this. For each it is specified which solution is used behind the requirement itself.
+	For the JML specifications the following variables are used:
+	\begin{lstlisting}
+float waterLevelLock;
+float waterLevelRight;
+float waterLevelLeft;
+boolean rightDoorOpen;
+boolean leftDoorOpen;
+int shipsWaitingRight;
+int shipsWaitingLeft;
+int shipsInLock;
+boolean shipBetweenDoors; // The ship being in an open door
+	\end{lstlisting}
+	For the Temporal Logic specifications the following variables are used:
+	\begin{lstlisting}
+left_door : {open, closed, opening, closing};
+right_door : {open, closed, opening, closing};
+audio_signal : {on, off};
+boat_location : {left, right, entering_left, entering_right, in_lock};
+	\end{lstlisting}
+	\begin{itemize}
+		\item There must be water within the lock (JML).
+		\begin{lstlisting}
+//@ invariant waterLevelLock > 0;
+		\end{lstlisting}
+		The water level within the lock is higher then 0 meters.
+		
+		\item The water in the lock should be at least 5 meters deep (JML).
+		\begin{lstlisting}
+//@ invariant waterLevelLock > 5;
+		\end{lstlisting}
+		The water level within the lock is higher then 5 meters.
+		
+		\item The gate should not open if the water level in the lock is lower than the water level on the other side(JML).
+		\begin{lstlisting}
+//@ requires waterLevelLock >= waterLevelRight;
+void OpenRightDoor() {
+}
+//@ requires waterLevelLock >= waterLevelLeft;
+void OpenLeftDoor() {
+}
+		\end{lstlisting}
+		According to the specification the doors only open if the water level within the lock is equal or higher then the water level on the other side of the lock. However in our opinion it should only open when the water level is equal.
+		
+		\item There should be a boat inside before raising the water (JML).
+		\begin{lstlisting}
+//@ requires shipsInLock == 1;
+void RaiseWater() {
+}
+		\end{lstlisting}
+		It requires one ship within the lock to raise the water. However now a waiting boat on the higher side, needs to wait for another boat to come up before able to go down. It should also raise the water if there is a boat waiting.
+		
+		\item Only one door can be opened at a time (JML).
+		\begin{lstlisting}
+//@ requires !rightDoorOpen;
+void OpenLeftDoor() {
+}
+//@ requires !leftDoorOpen;
+void OpenRightDoor() {
+}	
+		\end{lstlisting}
+		If the left door should open the right door can not be open and vice versa.
+		
+		\item Boats should be able to get to the other side of the lock (temporal).
+		\begin{lstlisting}
+LTLSPEC G((boat_location = left & X(boat_location = entering_left)) ->
+F boat_location = right);
+LTLSPEC G((boat_location = right & X(boat_location = entering_right)) ->
+F boat_location = left);
+		\end{lstlisting}
+		If a boat has a location left or right and the next state is that he is entering (in this case you dismiss boats who are leaving the lock), he should finally arrive at the other side of the lock. 
+		
+		\item Boats can only pass one at a time(JML).
+		\begin{lstlisting}
+//@ invariant shipsInLock == 0 || shipsInLock == 1;
+		\end{lstlisting}
+		Within the lock there can be either 0 or 1 ships.
+		
+		\item There should be an audio signal whenever the gate opens or closes (temporal).
+		\begin{lstlisting}
+LTLSPEC G(left_door = opening -> X audio_signal = on);
+LTLSPEC G(left_door = closing -> X audio_signal = on);
+LTLSPEC G(right_door = opening -> X audio_signal = on);
+LTLSPEC G(right_door = closing -> X audio_signal = on);
+		\end{lstlisting}
+		If a door is opening or closing the next state should be an audio signal turning on.
+		
+		\item When a boat has entered, the doors should close(temporal).
+		\begin{lstlisting}
+LTLSPEC G((boat_location = entering_left && X(boat_location = in_lock)) ->
+F (left_door = closed & right_door = closed));
+LTLSPEC G((boat_location = entering_right && X(boat_location = in_lock)) ->
+F (left_door = closed & right_door = closed));
+		\end{lstlisting}
+		If a boat is entering and the next state is that he is in the lock (in this case you dismiss boats who are leaving the lock), both doors should close.
+		
+		\item The doors should not close when a boat goes in (JML).
+		\begin{lstlisting}
+//@ requires !shipBetweenDoors;
+void CloseRightDoor() {
+}
+//@ requires !shipBetweenDoors;
+void CloseLeftDoor() {
+}
+		\end{lstlisting}
+		If a door needs to close it requires that there is not a boat between the doors.
+	\end{itemize}
 	
 	\section{SMV and Temporal Logics}
 	
@@ -56,10 +162,10 @@ LTLSPEC G(!P2A_locked_curved -> S4A_red)
 	\subsection{Full case}
 	Notice: we did not use the delay case
 	
-
+	
 	\section{Software Model Checking}
-
-
+	
+	
 	\subsection{Asserts and assumptions}
 	
 	
