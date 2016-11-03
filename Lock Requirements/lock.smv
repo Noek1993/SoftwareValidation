@@ -10,10 +10,10 @@ LTLSPEC G((boat_location = left & X(boat_location = entering_left)) -> F boat_lo
 LTLSPEC G((boat_location = right & X(boat_location = entering_right)) -> F boat_location = left);
 
 // There should be an audio signal whenever the gate opens or closes.
-LTLSPEC G(left_door = opening -> F audio_signal = on);
-LTLSPEC G(left_door = closing -> F audio_signal = on);
-LTLSPEC G(right_door = opening -> F audio_signal = on);
-LTLSPEC G(right_door = closing -> F audio_signal = on);
+LTLSPEC G(left_door = opening -> X audio_signal = on);
+LTLSPEC G(left_door = closing -> X audio_signal = on);
+LTLSPEC G(right_door = opening -> X audio_signal = on);
+LTLSPEC G(right_door = closing -> X audio_signal = on);
 
 // When a boat has entered, the doors should close.
 LTLSPEC G((boat_location = entering_left && X(boat_location = in_lock)) -> F (left_door = closed & right_door = closed));
