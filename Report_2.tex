@@ -170,8 +170,12 @@ G((T2A_occupied &  X T3A_occupied) -> F T4A_occupied)
 	
 	
 	\subsection{Full case}
-	Notice: we did not use the delay case
+	For this excise we had to modify the environment and interlocking so these would support having 2 trains. When starting this part of the excise it was not clear which model we had to use, the simple model of the modified delay model. In interlocking consultation with Wytse Oortwijn we made the decision to make a fresh copy of the simple model, in this way problem created in the delay case would not propagate into this part of the excise 
 	
+	The first step was to change the environment so that there would be 2 trains. This was achieved by creating an addition train and changing the occupation code for the tracks to check for both trains and change the code for the signals S1A and S1B. This was enough to make the environment and trains work as expected.
+	
+	The next step was to modify the interlocking so it would work correctly with 2 trains.
+	In  order to this we had to make sure that it was not possible for a point to have a goal straight and a goal curved. If 2 trains are in the system the inbound train always has priority over the train already in the passing area, as else the trains in the passing area can not leave. In te setup of this system that comes down to the fact that a goal straight always has priority over a goal curved. We implemented this by adding \texttt{TXX\_occupied : FALSE;} to the \texttt{next(PYY\_goal\_curved)}. In this way we blocked the possibility of having a goal curved set while it should straight.
 	
 	\section{Software Model Checking}
 	
