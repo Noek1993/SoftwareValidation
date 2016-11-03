@@ -160,8 +160,12 @@ LTLSPEC G(!P2A_locked_curved -> S4A_red)
 	Because of this situation we added this as an exception. The a goal curved can be replaced by a goal straight, as long as it will still eventually be locked curved. However depending on the interpretation of the informal requirements this still can be correct behavior.
 	
 	\subsection{Error case counter example}
-	
-	
+	The error case is checked and generates multiple errors with counter examples. Here we describe one of the counterexamples for the following specification: 
+	\begin{lstlisting}
+G((T2A_occupied &  X T3A_occupied) -> F T4A_occupied)
+	\end{lstlisting}
+	Sign 1A is red while the points are moving to straight. As soon as they are locked straight the sign 1A goes to green and track 1A is occupied by a train. Sign 2A also goes to green. The train moves to track 2A and afterwards sign 2A goes to red. Then the train moves to track 3A, sign 3A goes to green and sign 1B goes to red. The points 1B and 2A are both locked straight. The points starting moving to curved. Then a train enters track 1B and sign 2B goes to red. Then both points are locked curved and two trains both have a red sign and are waiting for each other to move or the points to move straight again. However this never happens creating an infinite wait.	
+
 	\subsection{Delay case}
 	
 	
