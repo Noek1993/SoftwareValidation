@@ -146,13 +146,13 @@ void CloseLeftDoor() {
 	\begin{lstlisting}
 LTLSPEC G((T4A_occupied & P2A_locked_straight) -> S4A_red)
 LTLSPEC G(((!P1B_locked_curved | T2B_occupied | T1B_occupied | T4A_occupied) 
-	& P2A_locked_curved) -> S4A_red)
+& P2A_locked_curved) -> S4A_red)
 LTLSPEC G((!P2A_locked_straight & !P2A_locked_curved) -> S4A_red)
 	\end{lstlisting}
 	Would be replaced with:
 	\begin{lstlisting}
 LTLSPEC G(((!P1B_locked_curved | T2B_occupied | T1B_occupied | T4A_occupied) 
-	& P2A_locked_curved) -> S4A_red)
+& P2A_locked_curved) -> S4A_red)
 LTLSPEC G(!P2A_locked_curved -> S4A_red)
 	\end{lstlisting}
 	
@@ -165,10 +165,13 @@ LTLSPEC G(!P2A_locked_curved -> S4A_red)
 G((T2A_occupied &  X T3A_occupied) -> F T4A_occupied)
 	\end{lstlisting}
 	Sign 1A is red while the points are moving to straight. As soon as they are locked straight the sign 1A goes to green and track 1A is occupied by a train. Sign 2A also goes to green. The train moves to track 2A and afterwards sign 2A goes to red. Then the train moves to track 3A, sign 3A goes to green and sign 1B goes to red. The points 1B and 2A are both locked straight. The points starting moving to curved. Then a train enters track 1B and sign 2B goes to red. Then both points are locked curved and two trains both have a red sign and are waiting for each other to move or the points to move straight again. However this never happens creating an infinite wait.	
-
+	
 	\subsection{Delay case}
-	
-	
+	Within the delay case we look at what happens when the points are not instantly locked when they start moving. To make this happen we add the stage moving to goal straight and goal curved.
+	Next we add FAIRNESS to make sure the state does not stay moving forever.
+	Compiling the points work as intended except for P1A \& P1B when they get the goal curved. When looking at the counterexample this is caused by a sign which switches to green when both points are not yet curved interlocked.
+	We will explain one of the counter example namely:
+
 	\subsection{Full case}
 	Notice: we did not use the delay case
 	
@@ -180,10 +183,13 @@ G((T2A_occupied &  X T3A_occupied) -> F T4A_occupied)
 	
 	
 	\subsection{The 2 case}
+	To check if our program can trace array out-of-bounds violations we change  $first = middle +1$ to $first = middle + 2$ and $last = middle - 1$ to $last = middle - 2$. \\
+	In our results we see that the assertion $middle >= 0  \&\&  middle < 64$ not passes indicating an out-of-bounds violation. This because it is possible for the array to put middle at 1 and subtract two or at 63 and add two.
 	
 	
 	\subsection{The minus plus switch case}
-	
+	Another way to check if our program traces out-of-bounds violations we change $first = middle +1$ to $first = middle - 1$ and $last = middle - 1$ to $last = middle + 1$.\\
+	Now all our claims pass, because of our assumption which states that first is always equal or bigger then zero and last always smaller then 64. This is not the case since first and last will now become smaller or bigger then those assumptions. However the program assume this can not happen, running it without any errors.
 	
 	
 \end{document}
