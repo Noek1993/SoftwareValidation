@@ -19,7 +19,7 @@
 	\maketitle
 	
 	\begin{abstract}
-		This homework assignment is done for the course System Validation. Here has been practised with Model checking through Temporal Logic, NuSMV and SatAbs. In the first part formal requirements were generated for a water lock. In the second part an interlocking system for railway tracks is formalized with the help op NuSMV. Finally a simple array out-of-bounds violations are checked with SatAbs. 
+		This homework assignment is done for the course System Validation. Here has been practiced with Model checking through Temporal Logic, NuSMV and SatAbs. In the first part formal requirements were generated for a water lock. In the second part an interlocking system for railway tracks is formalized with the help op NuSMV. Finally a simple array out-of-bounds violations are checked with SatAbs. 
 	\end{abstract}
 	
 	\section{Lock Requirements}
@@ -132,7 +132,11 @@ void CloseLeftDoor() {
 	\end{itemize}
 	
 	\section{SMV and Temporal Logics}
-	
+	\begin{figure}[h]
+		\centering
+		\includegraphics[width=\textwidth]{switches.PNG}
+		\caption{The layout of the passing area.}
+	\end{figure}
 	
 	\subsection{Properties}
 	the properties we have written are visible in the \textit{\textbf{properties.smv}} file that comes with this report.
@@ -141,12 +145,14 @@ void CloseLeftDoor() {
 	One of the assumptions we made was about the track parts \texttt{T4A} and \texttt{T4B}. According to the specifications it is allowed to move onto this piece of track as there is no mention otherwise, also according to the image there seems to be a relative big piece of track compared to the other switch tracks \texttt{T2A} and \texttt{T2B}. Based on this we made the assumption that the signals \texttt{S4A} and \texttt{S4B} can be green if they are locked straight. In this case a requirement similar to:
 	\begin{lstlisting}
 LTLSPEC G((T4A_occupied & P2A_locked_straight) -> S4A_red)
-LTLSPEC G(((!P1B_locked_curved | T2B_occupied | T1B_occupied | T4A_occupied) & P2A_locked_curved) -> S4A_red)
+LTLSPEC G(((!P1B_locked_curved | T2B_occupied | T1B_occupied | T4A_occupied) 
+	& P2A_locked_curved) -> S4A_red)
 LTLSPEC G((!P2A_locked_straight & !P2A_locked_curved) -> S4A_red)
 	\end{lstlisting}
 	Would be replaced with:
 	\begin{lstlisting}
-LTLSPEC G(((!P1B_locked_curved | T2B_occupied | T1B_occupied | T4A_occupied) & P2A_locked_curved) -> S4A_red)
+LTLSPEC G(((!P1B_locked_curved | T2B_occupied | T1B_occupied | T4A_occupied) 
+	& P2A_locked_curved) -> S4A_red)
 LTLSPEC G(!P2A_locked_curved -> S4A_red)
 	\end{lstlisting}
 	
