@@ -29,7 +29,23 @@
 	
 	
 	\subsection{Properties}
+	the properties we have written are visible in the \textit{\textbf{properties.smv}} file that comes with this report.
+	During the creation of these properties we made multiple assumptions, these we will mention in this section.
 	
+	One of the assumptions we made was about the track parts \texttt{T4A} and \texttt{T4B}. According to the specifications it is allowed to move onto this piece of track as there is no mention otherwise, also according to the image there seems to be a relative big piece of track compared to the other switch tracks \texttt{T2A} and \texttt{T2B}. Based on this we made the assumption that the signals \texttt{S4A} and \texttt{S4B} can be green if they are locked straight. In this case a requirement similar to:
+	\begin{lstlisting}
+LTLSPEC G((T4A_occupied & P2A_locked_straight) -> S4A_red)
+LTLSPEC G(((!P1B_locked_curved | T2B_occupied | T1B_occupied | T4A_occupied) & P2A_locked_curved) -> S4A_red)
+LTLSPEC G((!P2A_locked_straight & !P2A_locked_curved) -> S4A_red)
+	\end{lstlisting}
+	Would be replaced with:
+	\begin{lstlisting}
+LTLSPEC G(((!P1B_locked_curved | T2B_occupied | T1B_occupied | T4A_occupied) & P2A_locked_curved) -> S4A_red)
+LTLSPEC G(!P2A_locked_curved -> S4A_red)
+	\end{lstlisting}
+	
+	A situation where we partly deviated from the specifications is in the case of \textit{\textbf{The points always follow the given commands}}. This partly has to do with our interpretation of the specification and with the functions of the system. In our interpretation we interpreted this requirement as when a goal is given it has to follow the order before having a new order. However this will not work in a situation with multiple trains. In some situations a certain order has priority over an other one. This is the case with 2 trains at \texttt{T1A} and \texttt{T3B}. In the example first a train would arrive at \texttt{T3B}, setting the goal of 2 points to curved. However then a train arrives at \texttt{T1A}, the goals of the points are set to straight while their never entered a locked curved position.
+	Because of this situation we added this as an exception. The a goal curved can be replaced by a goal straight, as long as it will still eventually be locked curved. However depending on the interpretation of the informal requirements this still can be correct behavior.
 	
 	\subsection{Error case counter example}
 	
