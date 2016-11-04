@@ -184,7 +184,20 @@ G((T2A_occupied &  X T3A_occupied) -> F T4A_occupied)
 	
 	
 	\subsection{Asserts and assumptions}
+	In order to validate this this program using SatAbs we added a set of assumptions and assertions.
+	The first assertion added is as following:
+	\begin{lstlisting}	
+assert(middle >= 0 && middle < N);
+	\end{lstlisting}
+	This is located at the end of the while loop, after the calculation of the \texttt{middle} value. If the middle is between $0$ and $n$ (exclusive) the value is in bounds of the array.
 	
+	Next we added 2 assumptions at the beginning of the while loop:
+	\begin{lstlisting}
+__CPROVER_assume(first >=0);
+__CPROVER_assume(last < n);
+	\end{lstlisting}
+	We make this assumptions based on the fact that \texttt{first} never becomes lower then its initial value and that \texttt{last} never becomes higher then its initial value. This because \texttt{first} only increases and \texttt{last} only decreases. In a case where \texttt{first} would be greater then \texttt{last} the look would stop, This means we do not have to care about \texttt{first} becoming $n$ or larger or \texttt{last} becoming smaller then $0$.	
+	With these assumptions SatAbs is able to satisfy the assertion.
 	
 	\subsection{The 2 case}
 	To check if our program can trace array out-of-bounds violations we change  $first = middle +1$ to $first = middle + 2$ and $last = middle - 1$ to $last = middle - 2$. \\
