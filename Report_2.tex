@@ -26,107 +26,107 @@
 	The first exercise relates to the lock specification exercise as given in the first exercise session of the course. Below all informal requirements are given and a JML or temporal logic specification to solve this. For each it is specified which solution is used behind the requirement itself.
 	For the JML specifications the following variables are used:
 	\begin{lstlisting}
-float waterLevelLock;
-float waterLevelRight;
-float waterLevelLeft;
-boolean rightDoorOpen;
-boolean leftDoorOpen;
-int shipsWaitingRight;
-int shipsWaitingLeft;
-int shipsInLock;
-boolean shipBetweenDoors; // The ship being in an open door
+	float waterLevelLock;
+	float waterLevelRight;
+	float waterLevelLeft;
+	boolean rightDoorOpen;
+	boolean leftDoorOpen;
+	int shipsWaitingRight;
+	int shipsWaitingLeft;
+	int shipsInLock;
+	boolean shipBetweenDoors; // The ship being in an open door
 	\end{lstlisting}
 	For the Temporal Logic specifications the following variables are used:
 	\begin{lstlisting}
-left_door : {open, closed, opening, closing};
-right_door : {open, closed, opening, closing};
-audio_signal : {on, off};
-boat_location : {left, right, entering_left, entering_right, in_lock};
+	left_door : {open, closed, opening, closing};
+	right_door : {open, closed, opening, closing};
+	audio_signal : {on, off};
+	boat_location : {left, right, entering_left, entering_right, in_lock};
 	\end{lstlisting}
 	\begin{itemize}
 		\item There must be water within the lock (JML).
 		\begin{lstlisting}
-//@ invariant waterLevelLock > 0;
+		//@ invariant waterLevelLock > 0;
 		\end{lstlisting}
 		The water level within the lock is higher then 0 meters.
 		
 		\item The water in the lock should be at least 5 meters deep (JML).
 		\begin{lstlisting}
-//@ invariant waterLevelLock > 5;
+		//@ invariant waterLevelLock > 5;
 		\end{lstlisting}
 		The water level within the lock is higher then 5 meters.
 		
 		\item The gate should not open if the water level in the lock is lower than the water level on the other side(JML).
 		\begin{lstlisting}
-//@ requires waterLevelLock >= waterLevelRight;
-void OpenRightDoor() {
-}
-//@ requires waterLevelLock >= waterLevelLeft;
-void OpenLeftDoor() {
-}
+		//@ requires waterLevelLock >= waterLevelRight;
+		void OpenRightDoor() {
+		}
+		//@ requires waterLevelLock >= waterLevelLeft;
+		void OpenLeftDoor() {
+		}
 		\end{lstlisting}
 		According to the specification the doors only open if the water level within the lock is equal or higher then the water level on the other side of the lock. However in our opinion it should only open when the water level is equal.
 		
 		\item There should be a boat inside before raising the water (JML).
 		\begin{lstlisting}
-//@ requires shipsInLock == 1;
-void RaiseWater() {
-}
+		//@ requires shipsInLock == 1;
+		void RaiseWater() {
+		}
 		\end{lstlisting}
 		It requires one ship within the lock to raise the water. However now a waiting boat on the higher side, needs to wait for another boat to come up before able to go down. It should also raise the water if there is a boat waiting.
 		
 		\item Only one door can be opened at a time (JML).
 		\begin{lstlisting}
-//@ requires !rightDoorOpen;
-void OpenLeftDoor() {
-}
-//@ requires !leftDoorOpen;
-void OpenRightDoor() {
-}	
+		//@ requires !rightDoorOpen;
+		void OpenLeftDoor() {
+		}
+		//@ requires !leftDoorOpen;
+		void OpenRightDoor() {
+		}	
 		\end{lstlisting}
 		If the left door should open the right door can not be open and vice versa.
 		
 		\item Boats should be able to get to the other side of the lock (temporal).
 		\begin{lstlisting}
-LTLSPEC G((boat_location = left & X(boat_location = entering_left)) ->
-F boat_location = right);
-LTLSPEC G((boat_location = right & X(boat_location = entering_right)) ->
-F boat_location = left);
+		LTLSPEC G((boat_location = left & X(boat_location = entering_left)) ->
+		F boat_location = right);
+		LTLSPEC G((boat_location = right & X(boat_location = entering_right)) ->
+		F boat_location = left);
 		\end{lstlisting}
 		If a boat has a location left or right and the next state is that he is entering (in this case you dismiss boats who are leaving the lock), he should finally arrive at the other side of the lock. 
 		
 		\item Boats can only pass one at a time(JML).
 		\begin{lstlisting}
-//@ invariant shipsInLock == 0 || shipsInLock == 1;
+		//@ invariant shipsInLock == 0 || shipsInLock == 1;
 		\end{lstlisting}
 		Within the lock there can be either 0 or 1 ships.
 		
 		\item There should be an audio signal whenever the gate opens or closes (temporal).
 		\begin{lstlisting}
-LTLSPEC G(left_door = opening -> X audio_signal = on);
-LTLSPEC G(left_door = closing -> X audio_signal = on);
-LTLSPEC G(right_door = opening -> X audio_signal = on);
-LTLSPEC G(right_door = closing -> X audio_signal = on);
+		LTLSPEC G(left_door = opening -> X audio_signal = on);
+		LTLSPEC G(left_door = closing -> X audio_signal = on);
+		LTLSPEC G(right_door = opening -> X audio_signal = on);
+		LTLSPEC G(right_door = closing -> X audio_signal = on);
 		\end{lstlisting}
 		If a door is opening or closing the next state should be an audio signal turning on.
 		
 		\item When a boat has entered, the doors should close(temporal).
 		\begin{lstlisting}
-LTLSPEC G((boat_location = entering_left && X(boat_location = in_lock)) ->
-F (left_door = closed & right_door = closed));
-LTLSPEC G((boat_location = entering_right && X(boat_location = in_lock)) ->
-F (left_door = closed & right_door = closed));
+		LTLSPEC G((boat_location = entering_left && X(boat_location = in_lock)) ->
+		F (left_door = closed & right_door = closed));
+		LTLSPEC G((boat_location = entering_right && X(boat_location = in_lock)) ->
+		F (left_door = closed & right_door = closed));
 		\end{lstlisting}
 		If a boat is entering and the next state is that he is in the lock (in this case you dismiss boats who are leaving the lock), both doors should close.
 		
 		\item The doors should not close when a boat goes in (JML).
 		\begin{lstlisting}
-//@ requires !shipBetweenDoors;
-void CloseRightDoor() {
-}
-//@ requires !shipBetweenDoors;
-void CloseLeftDoor() {
-}
+		//@ requires !shipBetweenDoors;
+		void CloseRightDoor() {
+		}
+		//@ requires !shipBetweenDoors;
+		void CloseLeftDoor() {
+		}
 		\end{lstlisting}
 		If a door needs to close it requires that there is not a boat between the doors.
 	\end{itemize}
@@ -144,16 +144,16 @@ void CloseLeftDoor() {
 	
 	One of the assumptions we made was about the track parts \texttt{T4A} and \texttt{T4B}. According to the specifications it is allowed to move onto this piece of track as there is no mention otherwise, also according to the image there seems to be a relative big piece of track compared to the other switch tracks \texttt{T2A} and \texttt{T2B}. Based on this we made the assumption that the signals \texttt{S4A} and \texttt{S4B} can be green if they are locked straight. In this case a requirement similar to:
 	\begin{lstlisting}
-LTLSPEC G((T4A_occupied & P2A_locked_straight) -> S4A_red)
-LTLSPEC G(((!P1B_locked_curved | T2B_occupied | T1B_occupied | T4A_occupied) 
-& P2A_locked_curved) -> S4A_red)
-LTLSPEC G((!P2A_locked_straight & !P2A_locked_curved) -> S4A_red)
+	LTLSPEC G((T4A_occupied & P2A_locked_straight) -> S4A_red)
+	LTLSPEC G(((!P1B_locked_curved | T2B_occupied | T1B_occupied | T4A_occupied) 
+	& P2A_locked_curved) -> S4A_red)
+	LTLSPEC G((!P2A_locked_straight & !P2A_locked_curved) -> S4A_red)
 	\end{lstlisting}
 	Would be replaced with:
 	\begin{lstlisting}
-LTLSPEC G(((!P1B_locked_curved | T2B_occupied | T1B_occupied | T4A_occupied) 
-& P2A_locked_curved) -> S4A_red)
-LTLSPEC G(!P2A_locked_curved -> S4A_red)
+	LTLSPEC G(((!P1B_locked_curved | T2B_occupied | T1B_occupied | T4A_occupied) 
+	& P2A_locked_curved) -> S4A_red)
+	LTLSPEC G(!P2A_locked_curved -> S4A_red)
 	\end{lstlisting}
 	
 	A situation where we partly deviated from the specifications is in the case of \textit{\textbf{The points always follow the given commands}}. This partly has to do with our interpretation of the specification and with the functions of the system. In our interpretation we interpreted this requirement as when a goal is given it has to follow the order before having a new order. However this will not work in a situation with multiple trains. In some situations a certain order has priority over an other one. This is the case with 2 trains at \texttt{T1A} and \texttt{T3B}. In the example first a train would arrive at \texttt{T3B}, setting the goal of 2 points to curved. However then a train arrives at \texttt{T1A}, the goals of the points are set to straight while their never entered a locked curved position.
@@ -162,7 +162,7 @@ LTLSPEC G(!P2A_locked_curved -> S4A_red)
 	\subsection{Error case counter example}
 	The error case is checked and generates multiple errors with counter examples. Here we describe one of the counterexamples for the following specification: 
 	\begin{lstlisting}
-G((T2A_occupied &  X T3A_occupied) -> F T4A_occupied)
+	G((T2A_occupied &  X T3A_occupied) -> F T4A_occupied)
 	\end{lstlisting}
 	Sign 1A is red while the points are moving to straight. As soon as they are locked straight the sign 1A goes to green and track 1A is occupied by a train. Sign 2A also goes to green. The train moves to track 2A and afterwards sign 2A goes to red. Then the train moves to track 3A, sign 3A goes to green and sign 1B goes to red. The points 1B and 2A are both locked straight. The points starting moving to curved. Then a train enters track 1B and sign 2B goes to red. Then both points are locked curved and two trains both have a red sign and are waiting for each other to move or the points to move straight again. However this never happens creating an infinite wait.	
 	
@@ -171,7 +171,12 @@ G((T2A_occupied &  X T3A_occupied) -> F T4A_occupied)
 	Next we add FAIRNESS to make sure the state does not stay moving forever.
 	Compiling the points work as intended except for P1A \& P1B when they get the goal curved. When looking at the counterexample this is caused by a sign which switches to green when both points are not yet curved interlocked.
 	We will explain one of the counter example namely:
-
+\begin{lstlisting}
+ G (((((!P1B_locked_curved | T2B_occupied) | T1B_occupied) | T4A_occupied)
+ & P2A_locked_curved) -> S4A_red)
+\end{lstlisting}
+	A train moves to track 3A from track 2A and waits for sign 4A which is red. Points 1B and 2A start moving to curved. First point 2A gets locked curved, while point 1B is still moving. Instead of waiting until this movement is finished sign 4A becomes green and the train starts to move, making its way to track 4A and then wants to go to track 2B. This is impossible since point 1B is not locked curved yet, creating an error. 
+	
 	\subsection{Full case}
 	For this excise we had to modify the environment and interlocking so these would support having 2 trains. When starting this part of the excise it was not clear which model we had to use, the simple model of the modified delay model. In interlocking consultation with Wytse Oortwijn we made the decision to make a fresh copy of the simple model, in this way problem created in the delay case would not propagate into this part of the excise 
 	
